@@ -12,11 +12,11 @@ class DriveTrain(object):
     '''
 
 
-    def __init__(self, params):
+    def __init__(self, leftDrive, rightDrive):
         '''
         Constructor
         '''
-        self.robotDrive = wpilib.RobotDrive(params[0], params[1])
+        self.robotDrive = wpilib.RobotDrive(leftDrive, rightDrive)
         
     def arcadeDrive(self, move, rotate):
         self.robotDrive.arcadeDrive(move, rotate, True)

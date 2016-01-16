@@ -29,14 +29,15 @@ class MyRobot(wpilib.SampleRobot):
         self.driveTrain = driveTrain.DriveTrain(1,0)
         self.queue = queue.Queue(5)
         self.flipper = flipper.Flipper(4)
-        
+        self.robotAccel = wpilib.BuiltInAccelerometer()
         self.shooterWasSet = False
+        self.shooterSet = 0.0
         
         # joysticks 1 & 2 on the driver station
         self.leftStick = wpilib.Joystick(0)
         self.rightStick = wpilib.Joystick(1)
         
-        print("Initialization Successful")
+        print("Initialization Successfulrc")
         
     def generate(self, a, b=-1):
         if(b == -1):
@@ -47,18 +48,20 @@ class MyRobot(wpilib.SampleRobot):
     def operatorControl(self):
         '''Runs the motors with tank steering'''
         
-        self.myRobot.setSafetyEnabled(True)
         #3 - left trigger
         #4 - right trigger
+        self.shooterSet = 0.0
+        self.shooterWasSet = False
         while self.isOperatorControl() and self.isEnabled():
             
+            wpilib.SmartDashboard.putNumber("z-accel", self.robotAccel.getZ())
             self.driveTrain.arcadeDrive(self.leftStick.getRawAxis(5), -self.leftStick.getRawAxis(0))
             
             flipperSet = (self.leftStick.getRawAxis(3)  -self.leftStick.getRawAxis(2)) / -1.2
             self.flipper.set(flipperSet)
             
             intakeSet = self.generate(2,3)
-            self.tower.set(-intakeSet)
+            self.intake.set(-intakeSet)
             
             queueSet = self.generate(1,4)
             self.queue.set(-queueSet)
@@ -75,7 +78,7 @@ class MyRobot(wpilib.SampleRobot):
             elif(shooterSet == 0.0 and self.shooterWasSet):
                 self.shooterWasSet = False
                     
-            self.shooter.set(-self.shooterSet)
+            self.shooter.set(-self.shooterSet * 7.6)
             
 #
 #             intakeSet = 1.0 if self.leftStick.getRawButton(2) else (-1.0 if self.leftStick.getRawButton(3) else 0.0)
