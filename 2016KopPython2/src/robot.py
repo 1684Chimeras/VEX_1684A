@@ -18,6 +18,7 @@ class MyRobot(wpilib.SampleRobot):
         '''Robot initialization function'''
         print("Initialization Started")
         # object that handles basic drive operations
+        #hello from github
         self.myRobot = wpilib.RobotDrive(1,0)
         self.myRobot.setExpiration(0.651)
         self.intake = wpilib.VictorSP(2)
