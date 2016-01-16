@@ -12,6 +12,10 @@
 
 import wpilib
 
+from modules import driveTrain, intake, queue, shooter, flipper
+
+
+
 class MyRobot(wpilib.SampleRobot):
     
     def robotInit(self):
@@ -19,14 +23,14 @@ class MyRobot(wpilib.SampleRobot):
         print("Initialization Started")
         # object that handles basic drive operations
         #hello from github
-        self.myRobot = wpilib.RobotDrive(1,0)
-        self.myRobot.setExpiration(0.651)
-        self.intake = wpilib.VictorSP(2)
-        self.tower = wpilib.VictorSP(3)
-        self.tower_right = wpilib.VictorSP(4)
-        self.idk_what_this_is = wpilib.VictorSP(5)
-        self.talon = wpilib.CANTalon(1)
-        self.talon.changeControlMode(wpilib.CANTalon.ControlMode.PercentVbus)
+        
+        self.intake = intake.Intake(3)
+        self.shooter = shooter.Shooter(1)
+        self.driveTrain = driveTrain.DriveTrain(1,0)
+        self.queue = queue.Queue(5)
+        self.flipper = flipper.Flipper(4)
+        
+        self.shooterWasSet = False
         
         # joysticks 1 & 2 on the driver station
         self.leftStick = wpilib.Joystick(0)
@@ -34,6 +38,12 @@ class MyRobot(wpilib.SampleRobot):
         
         print("Initialization Successful")
         
+    def generate(self, a, b=-1):
+        if(b == -1):
+            return 1.0 if self.leftStick.getRawButton(a) else 0
+        else:
+            return 1.0 if self.leftStick.getRawButton(a) else (-1.0 if self.leftStick.getRawButton(b) else 0.0)
+    
     def operatorControl(self):
         '''Runs the motors with tank steering'''
         
@@ -41,21 +51,43 @@ class MyRobot(wpilib.SampleRobot):
         #3 - left trigger
         #4 - right trigger
         while self.isOperatorControl() and self.isEnabled():
-            self.myRobot.arcadeDrive(self.leftStick.getRawAxis(5), -self.leftStick.getRawAxis(0), True)
-            towerSet = (self.leftStick.getRawAxis(3)  -self.leftStick.getRawAxis(2)) / -1.2
             
-            self.tower_right.set(towerSet)
+            self.driveTrain.arcadeDrive(self.leftStick.getRawAxis(5), -self.leftStick.getRawAxis(0))
             
-            flipperSet = 1.0 if self.leftStick.getRawButton(2) else (-1.0 if self.leftStick.getRawButton(3) else 0.0)
-            self.tower.set(-flipperSet)
-            print(flipperSet)
+            flipperSet = (self.leftStick.getRawAxis(3)  -self.leftStick.getRawAxis(2)) / -1.2
+            self.flipper.set(flipperSet)
             
-            idkSet = 1.0 if self.leftStick.getRawButton(1) else (-1.0 if self.leftStick.getRawButton(4) else 0.0)
-            self.idk_what_this_is.set(-idkSet)
+            intakeSet = self.generate(2,3)
+            self.tower.set(-intakeSet)
             
-            shooterSet = 1.0 if self.leftStick.getRawButton(6) else (-1.0 if self.leftStick.getRawButton(5) else  0.0)
-        
-            self.talon.set(-shooterSet)
+            queueSet = self.generate(1,4)
+            self.queue.set(-queueSet)
+            
+            shooterSet = self.generate(6,5)
+            
+            if(shooterSet != 0.0 and not self.shooterWasSet):
+                if(self.shooterSet == 0.0):
+                    self.shooterSet = shooterSet
+                else:
+                    self.shooterSet = 0.0
+                    
+                self.shooterWasSet = True
+            elif(shooterSet == 0.0 and self.shooterWasSet):
+                self.shooterWasSet = False
+                    
+            self.shooter.set(-self.shooterSet)
+            
+#
+#             intakeSet = 1.0 if self.leftStick.getRawButton(2) else (-1.0 if self.leftStick.getRawButton(3) else 0.0)
+#             self.tower.set(-intakeSet)
+#             
+#             queue = 1.0 if self.leftStick.getRawButton(1) else (-1.0 if self.leftStick.getRawButton(4) else 0.0)
+#             self.queue.set(-queue)
+#             
+#             shooterSet = 1.0 if self.leftStick.getRawButton(6) else (-1.0 if self.leftStick.getRawButton(5) else  0.0)
+#             self.shooter.set(-shooterSet)
+            
+            
             wpilib.Timer.delay(0.005) # wait for a motor update time
             
 if __name__ == '__main__':
