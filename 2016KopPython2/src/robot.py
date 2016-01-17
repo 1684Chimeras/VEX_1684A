@@ -12,9 +12,9 @@
 
 import wpilib
 
-from modules import driveTrain, intake, queue, shooter, flipper
+from modules import driveTrain, intake, queue, shooter, flipper, climber
 
-
+#robot experience -8g crosing the 2012 bump
 
 class MyRobot(wpilib.SampleRobot):
     
@@ -29,13 +29,14 @@ class MyRobot(wpilib.SampleRobot):
         self.driveTrain = driveTrain.DriveTrain(1,0)
         self.queue = queue.Queue(5)
         self.flipper = flipper.Flipper(4)
+        self.climber = climber.Climber(6)
         self.robotAccel = wpilib.BuiltInAccelerometer()
         self.shooterWasSet = False
         self.shooterSet = 0.0
-        
         # joysticks 1 & 2 on the driver station
         self.leftStick = wpilib.Joystick(0)
         self.rightStick = wpilib.Joystick(1)
+      #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
         
         print("Initialization Successfulrc")
         
@@ -65,6 +66,9 @@ class MyRobot(wpilib.SampleRobot):
             
             queueSet = self.generate(1,4)
             self.queue.set(-queueSet)
+            
+            climberWinchSet = 1.0 if self.leftStick.getPOV() == 90 else (-1.0 if self.leftStick.getPOV() == 270 else 0.0)
+            self.climber.set(climberWinchSet)
             
             shooterSet = self.generate(6,5)
             
