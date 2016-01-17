@@ -62,9 +62,13 @@ class MyRobot(wpilib.SampleRobot):
             self.flipper.set(flipperSet)
             
             intakeSet = self.generate(2,3)
-            self.intake.set(-intakeSet)
-            
+            self.intake.set(-intakeSet * 0.6)
+        
             queueSet = self.generate(1,4)
+            
+            if(intakeSet > 0.1 and queueSet == 0.0):
+                queueSet = 0.25
+                
             self.queue.set(-queueSet)
             
             climberWinchSet = 1.0 if self.leftStick.getPOV() == 90 else (-1.0 if self.leftStick.getPOV() == 270 else 0.0)
