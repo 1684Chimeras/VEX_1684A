@@ -44,6 +44,7 @@ class InputOption(object):
         ret.usePov = True 
         ret.deg1 = deg1
         ret.deg2 = deg2
+        return ret
 
     def __value(self):
         if self.usePov:
@@ -56,9 +57,9 @@ class InputOption(object):
         elif self.useAxis:
             return self.joystick.getRawAxis(self.axis)
         elif self.useButton:
-            if self.joystick.getRawButton(self.button1):
+            if self.button1 > 0 and self.joystick.getRawButton(self.button1):
                 return 1.0
-            elif self.button2 and self.joystick.getRawButton(self.button2):
+            elif self.button2 > 0 and self.joystick.getRawButton(self.button2):
                 return -1.0
             else:
                 return 0.0
@@ -68,7 +69,7 @@ class InputOption(object):
             print("IDK WHAT HAPPENED LOL")
             return 0.0
     def toDouble(self): 
-        return 0
+        return self.__value()
     
     def toBoolean(self):
         return False
@@ -78,3 +79,7 @@ class InputOption(object):
         Constructor
         '''
         self.joystick = joystick
+        self.usePov = False
+        self.useTriggers = False
+        self.useAxis = False 
+        self.useButton = False
