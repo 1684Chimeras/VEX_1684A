@@ -26,11 +26,13 @@ class MyRobot(wpilib.SampleRobot):
         
         self.intake = intake.Intake(3)
         self.shooter = shooter.Shooter(1)
-        self.driveTrain = driveTrain.DriveTrain(1,0)
+        self.driveTrain = driveTrain.DriveTrain(0,1)
         self.queue = queue.Queue(5)
         self.flipper = flipper.Flipper(4)
         self.climber = climber.Climber(6)
         self.robotAccel = wpilib.BuiltInAccelerometer()
+        self.climberRuler = wpilib.VictorSP(8)
+        
         self.shooterWasSet = False
         self.shooterSet = 0.0
         # joysticks 1 & 2 on the driver station
@@ -40,11 +42,11 @@ class MyRobot(wpilib.SampleRobot):
         
         print("Initialization Successfulrc")
         
-    def generate(self, a, b=-1):
+    def generate(self, stick, a, b=-1):
         if(b == -1):
-            return 1.0 if self.leftStick.getRawButton(a) else 0
+            return 1.0 if stick.getRawButton(a) else 0
         else:
-            return 1.0 if self.leftStick.getRawButton(a) else (-1.0 if self.leftStick.getRawButton(b) else 0.0)
+            return 1.0 if stick.getRawButton(a) else (-1.0 if self.leftStick.getRawButton(b) else 0.0)
     
     def operatorControl(self):
         '''Runs the motors with tank steering'''
@@ -61,20 +63,24 @@ class MyRobot(wpilib.SampleRobot):
             flipperSet = (self.leftStick.getRawAxis(3)  -self.leftStick.getRawAxis(2)) / -1.2
             self.flipper.set(flipperSet)
             
-            intakeSet = self.generate(2,3)
+            intakeSet = self.generate(self.leftStick, 2,3)
             self.intake.set(-intakeSet * 0.6)
         
-            queueSet = self.generate(1,4)
+            queueSet = self.generate(self.leftStick, 1,4)
             
             if(intakeSet > 0.1 and queueSet == 0.0):
                 queueSet = 0.25
                 
             self.queue.set(-queueSet)
             
+            climberRulerSet = 1.0 if self.leftStick.getPOV() == 0 else (-0.6 if self.leftStick.getPOV() == 180 else 0.0)
+            self.climberRuler.set(-climberRulerSet)
+            print("Climber Ruer set ")
+            
             climberWinchSet = 1.0 if self.leftStick.getPOV() == 90 else (-1.0 if self.leftStick.getPOV() == 270 else 0.0)
             self.climber.set(climberWinchSet)
             
-            shooterSet = self.generate(6,5)
+            shooterSet = self.generate(self.rightStick, 6,5)
             
             if(shooterSet != 0.0 and not self.shooterWasSet):
                 if(self.shooterSet == 0.0):
