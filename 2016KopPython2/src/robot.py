@@ -12,7 +12,6 @@
 
 import wpilib
 import oi
-import modules.driveTrain
 from modules import driveTrain, intake, queue, shooter, flipper, climber
 from wpilib.driverstation import DriverStation
 
@@ -77,10 +76,10 @@ class MyRobot(wpilib.SampleRobot):
                 
             self.driveTrain.arcadeDrive(OI.driver_move.toDouble(), -OI.driver_rotate.toDouble())
             self.flipper.set(OI.flipper.toDouble())
-            self.intake.set(-OI.intake.toDouble() * 0.4)
+            self.intake.set(-OI.intake.toDouble() * 0.65)
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
                 self.queue.set(-0.7)
-            else:
+            else: #time to shot- 4sec
                 self.queue.set(OI.queue.toDouble())  
             self.climber.set(self.deadband(OI.pulley.toDouble()))
             self.climberRuler.set(self.deadband(OI.tape.toDouble()))

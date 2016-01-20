@@ -4,8 +4,8 @@ Created on Jan 18, 2016
 @author: Arhowk
 '''
 import wpilib
-import inputOption
-from inputOption import InputOption
+import input_option
+from input_option import InputOption
 
 class OI(object):
     '''
@@ -42,7 +42,8 @@ class OI(object):
         operator = OI.joy1
         #tableEx = [["squaredInputs","1"], ["scalar","2"]]
         
-        OI.intake = InputOption.buttons(driver, OI.b, OI.x)
+        OI.intake = InputOption.triggers(driver)
+        #OI.intake = InputOption.buttons(driver, OI.b, OI.x)
         OI.queue = InputOption.buttons(driver, OI.y, OI.a)
         OI.shooter = InputOption.button(driver, OI.rb)
         OI.pulley = InputOption.axis(operator, OI.ly)
