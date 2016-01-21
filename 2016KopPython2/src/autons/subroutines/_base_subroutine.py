@@ -4,8 +4,10 @@ import time
 
 class Subroutine:
     
+    drive_train = 0
+    
     def __init__(self):
-        self.timeoutDur == -1
+        self.timeoutDur = -1
         self.timeoutStart = 0
         self.finished = False
     

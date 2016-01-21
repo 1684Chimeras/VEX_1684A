@@ -12,7 +12,8 @@
 
 import wpilib 
 import oi
-from modules import driveTrain, intake, queue, shooter, flipper, climber
+from modules.queue import Queue
+from modules import driveTrain, intake, shooter, flipper, climber
 from wpilib.driverstation import DriverStation
 
 #robot experience -8g crosing the 2012 bump
@@ -29,7 +30,7 @@ class MyRobot(wpilib.SampleRobot):
         self.intake = intake.Intake(3,7)
         self.shooter = shooter.Shooter(1)
         self.driveTrain = driveTrain.DriveTrain(0,1)
-        self.queue = queue.Queue(5)
+        self.queue = Queue(5)
         self.flipper = flipper.Flipper(4)
         self.climber = climber.Climber(6)
         self.robotAccel = wpilib.BuiltInAccelerometer()
