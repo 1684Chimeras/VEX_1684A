@@ -1,17 +1,20 @@
-'''
-Created on Jan 19, 2016
+import wpilib
+import _base_auton
 
-@author: Arhowk
-'''
+class CrossDefense(_base_auton.BaseAutonRoutine):
 
-class MyClass(object):
-    '''
-    classdocs
-    '''
+    def getPriority(self):
+        return
 
+    def getName(self): 
+        return
 
-    def __init__(self, params):
-        '''
-        Constructor
-        '''
+    def getDescription(self):
+        return
         
+    def periodic(self):
+        return
+    
+    def initialize(self):
+        return
+    
