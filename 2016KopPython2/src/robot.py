@@ -26,7 +26,7 @@ class MyRobot(wpilib.SampleRobot):
         #hello from github
         wpilib.DriverStation.reportError(oi.OI.newLine + "Robot Code Initialize", False)
      
-        self.intake = intake.Intake(3)
+        self.intake = intake.Intake(3,7)
         self.shooter = shooter.Shooter(1)
         self.driveTrain = driveTrain.DriveTrain(0,1)
         self.queue = queue.Queue(5)
@@ -37,9 +37,6 @@ class MyRobot(wpilib.SampleRobot):
         
         self.shooterWasSet = False
         self.shooterSet = 0.0
-        # joysticks 1 & 2 on the driver station
-        self.leftStick = wpilib.Joystick(0)
-        self.rightStick = wpilib.Joystick(1)
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
         oi.OI.initialize()
         print("Initialization Successfulrc")

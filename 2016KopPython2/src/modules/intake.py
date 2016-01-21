@@ -12,11 +12,13 @@ class Intake(object):
     '''
 
 
-    def __init__(self, params):
+    def __init__(self, firstMotor, secondMotor):
         '''
         Constructor
         '''
-        self.motor = wpilib.VictorSP(params)
+        self.motor = wpilib.VictorSP(firstMotor)
+        self.motor_out = wpilib.VictorSP(secondMotor)
     
     def set(self, value):
         self.motor.set(value)
+        self.motor_out.set(value)
