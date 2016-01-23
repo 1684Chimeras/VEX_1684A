@@ -5,6 +5,7 @@ Created on Jan 16, 2016
 '''
 
 import wpilib
+import time
 import _thread
 
 class Shooter(object):
@@ -17,11 +18,13 @@ class Shooter(object):
         '''
         Constructor
         '''
+        self.voltageSetpoint = -7.6
         self.motor = wpilib.CANTalon(params)
         self.motor.enableBrakeMode(True)
         self.motor.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
         self.wasBrake = True
         self.toggleState = False
+        self.speed = 0
         _thread.start_new_thread( self.periodic, ("Shooter-Update-Thread", "literally nothing",))
         
     def enable(self):
@@ -33,7 +36,7 @@ class Shooter(object):
     
     def changeOnToggle(self, value):
         if abs(value) > 0.5:
-            if self.toggleState:
+            if not self.toggleState:
                 self.speed = 1 - self.speed
             self.toggleState = True
         else:
@@ -50,6 +53,8 @@ class Shooter(object):
                 self.toggleState = False
                 self.speed = 0
                 self.set(self.speed)
+                
+            time.sleep(0.005)
     
     def set(self, value):
         if(value > 0.1 or value < -0.1):
@@ -60,5 +65,5 @@ class Shooter(object):
             if(not self.wasBrake):
                 self.wasBrake = True
                 self.motor.enableBrakeMode(True)
-                
-        self.motor.set(value)
+        
+        self.motor.set(value * self.voltageSetpoint)

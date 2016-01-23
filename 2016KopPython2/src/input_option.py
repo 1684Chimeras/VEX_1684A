@@ -72,7 +72,7 @@ class InputOption(object):
         return self.__value()
     
     def toBoolean(self):
-        return False
+        return abs(self.__value()) > 0.3
     
     def __init__(self, joystick):
         '''

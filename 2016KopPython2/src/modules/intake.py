@@ -20,5 +20,5 @@ class Intake(object):
         self.motor_out = wpilib.VictorSP(secondMotor)
     
     def set(self, value):
-        self.motor.set(value)
-        self.motor_out.set(value)
+        self.motor.set(value * -1)
+        self.motor_out.set(value * -2)

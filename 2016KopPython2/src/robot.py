@@ -12,8 +12,8 @@
 
 import wpilib 
 import oi
-from modules.queue import Queue
-from modules import driveTrain, intake, shooter, flipper, climber
+from modules.queuee import Queue
+from modules import driveTrain, intake, shooter, flipper, climber, camera
 from wpilib.driverstation import DriverStation
 
 #robot experience -8g crosing the 2012 bump
@@ -29,11 +29,13 @@ class MyRobot(wpilib.SampleRobot):
      
         self.intake = intake.Intake(3,7)
         self.shooter = shooter.Shooter(1)
-        self.driveTrain = driveTrain.DriveTrain(0,1)
+        self.driveTrain = driveTrain.DriveTrain(0,1,2,9)
         self.queue = Queue(5)
         self.flipper = flipper.Flipper(4)
         self.climber = climber.Climber(6)
+        self.camera = camera.Camera()
         self.robotAccel = wpilib.BuiltInAccelerometer()
+        
         self.climberRuler = wpilib.VictorSP(8)
         
         self.shooterWasSet = False
@@ -70,9 +72,14 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterSet = 0.0
         self.shooterWasSet = False
         while self.isOperatorControl() and self.isEnabled():
-#             
+
+            driveFactor = 1
+            
+            if OI.drive_low.toBoolean():
+                driveFactor = 0.7
                 
-            self.driveTrain.arcadeDrive(OI.driver_move.toDouble(), -OI.driver_rotate.toDouble())
+                
+            self.driveTrain.arcadeDrive(OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
             self.flipper.set(OI.flipper.toDouble())
             self.intake.set(-OI.intake.toDouble() * 0.65)
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
@@ -81,7 +88,10 @@ class MyRobot(wpilib.SampleRobot):
                 self.queue.set(OI.queue.toDouble())  
             self.climber.set(self.deadband(OI.pulley.toDouble()))
             self.climberRuler.set(self.deadband(OI.tape.toDouble()))
-              
+            self.shooter.changeOnToggle(OI.shooter.toDouble())
+            
+            
+            '''
             shooterSet = OI.shooter.toDouble()
             print(shooterSet)
             if(shooterSet != 0.0 and not self.shooterWasSet):
@@ -93,8 +103,9 @@ class MyRobot(wpilib.SampleRobot):
                 self.shooterWasSet = True
             elif(shooterSet == 0.0 and self.shooterWasSet):
                 self.shooterWasSet = False
-                     
+                
             self.shooter.set(-self.shooterSet * 7.6)           
+            '''
 #old stuff
 #             wpilib.SmartDashboard.putNumber("z-accel", self.robotAccel.getZ())
 #             self.driveTrain.arcadeDrive(self.leftStick.getRawAxis(5), -self.leftStick.getRawAxis(0))
