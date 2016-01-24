@@ -11,11 +11,15 @@ class Climber(object):
     '''
 
 
-    def __init__(self, motor):
+    def __init__(self, pulley, tape):
         '''
         Constructor
         '''
-        self.motor = wpilib.VictorSP(motor)
+        self.pulley = wpilib.VictorSP(pulley)
+        self.tape = wpilib.VictorSP(tape)
         
-    def set(self,value):
-        self.motor.set(value)
+    def setPulley(self,value):
+        self.pulley.set(value)
+        
+    def setTape(self, value):
+        self.tape.set(value)

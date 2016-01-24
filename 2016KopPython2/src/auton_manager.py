@@ -5,6 +5,7 @@ Created on Jan 19, 2016
 '''
 
 from autons.subroutines._base_subroutine import Subroutine
+from autons import cross_and_score, cross_defense, do_nothing, spybot_score
 
 class AutonManager(object):
     '''
@@ -12,8 +13,8 @@ class AutonManager(object):
     '''
     
     def loadAutons(self):
-        return
-    
+        self.autons = [cross_and_score.CrossAndScore(), cross_defense.CrossDefense(), do_nothing.DoNothing(), spybot_score.SpybotScore()]
+        
     def autonomousInit(self):
         return
     

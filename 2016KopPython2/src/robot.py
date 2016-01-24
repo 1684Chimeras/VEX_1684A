@@ -32,11 +32,10 @@ class MyRobot(wpilib.SampleRobot):
         self.driveTrain = driveTrain.DriveTrain(0,1,2,9)
         self.queue = Queue(5)
         self.flipper = flipper.Flipper(4)
-        self.climber = climber.Climber(6)
+        self.climber = climber.Climber(6,8)
         self.camera = camera.Camera()
         self.robotAccel = wpilib.BuiltInAccelerometer()
         
-        self.climberRuler = wpilib.VictorSP(8)
         
         self.shooterWasSet = False
         self.shooterSet = 0.0
@@ -81,13 +80,14 @@ class MyRobot(wpilib.SampleRobot):
                 
             self.driveTrain.arcadeDrive(OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
             self.flipper.set(OI.flipper.toDouble())
-            self.intake.set(-OI.intake.toDouble() * 0.65)
+            self.intake.set(-OI.intake.toDouble())
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
-                self.queue.set(-0.7)
+                self.queue.set(-0.5)
             else: #time to shot- 4sec
-                self.queue.set(OI.queue.toDouble())  
-            self.climber.set(self.deadband(OI.pulley.toDouble()))
-            self.climberRuler.set(self.deadband(OI.tape.toDouble()))
+                self.queue.set(OI.queue.toDouble() * 0.4)  
+                
+            self.climber.setPulley(self.deadband(OI.pulley.toDouble()))
+            self.climber.setTape(self.deadband(OI.tape.toDouble()))
             self.shooter.changeOnToggle(OI.shooter.toDouble())
             
             
