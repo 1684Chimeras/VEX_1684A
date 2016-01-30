@@ -20,19 +20,34 @@ from wpilib.driverstation import DriverStation
 
 class MyRobot(wpilib.SampleRobot):
     
+    class RobotMap:
+        driveLeftA = 1
+        driveLeftB = 2
+        driveRightA = 3
+        driveRightB = 4
+        shooter = 1
+        arm = 5
+        pulley = 9
+        tape = 0
+        queue = 7
+        innerIntake = 6
+        outerIntake = 8
+    
     def robotInit(self):
         '''Robot initialization function'''
         print("Initialization Started")
         # object that handles basic drive operations
         #hello from github
+        RobotMap = self.RobotMap
+        
         wpilib.DriverStation.reportError(oi.OI.newLine + "Robot Code Initialize", False)
      
-        self.intake = intake.Intake(3,7)
-        self.shooter = shooter.Shooter(1)
-        self.driveTrain = driveTrain.DriveTrain(0,1,2,9)
-        self.queue = Queue(5)
-        self.flipper = flipper.Flipper(4)
-        self.climber = climber.Climber(6,8)
+        self.intake = intake.Intake(RobotMap.innerIntake,RobotMap.outerIntake)
+        self.shooter = shooter.Shooter(RobotMap.shooter)
+        self.driveTrain = driveTrain.DriveTrain(RobotMap.driveLeftA,RobotMap.driveRightA,RobotMap.driveLeftB,RobotMap.driveRightB)
+        self.queue = Queue(RobotMap.queue)
+        self.flipper = flipper.Flipper(RobotMap.arm)
+        self.climber = climber.Climber(RobotMap.pulley,RobotMap.tape)
         self.camera = camera.Camera()
         self.robotAccel = wpilib.BuiltInAccelerometer()
         
@@ -71,15 +86,15 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterSet = 0.0
         self.shooterWasSet = False
         while self.isOperatorControl() and self.isEnabled():
-
+ 
             driveFactor = 1
             
             if OI.drive_low.toBoolean():
                 driveFactor = 0.7
                 
                 
-            self.driveTrain.arcadeDrive(OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
-            self.flipper.set(OI.flipper.toDouble())
+            self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
+            self.flipper.set(OI.flipper.toDouble() * 0.4)
             self.intake.set(-OI.intake.toDouble())
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
                 self.queue.set(-0.5)
