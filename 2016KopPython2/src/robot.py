@@ -16,7 +16,7 @@ from modules.queuee import Queue
 from modules import driveTrain, intake, shooter, flipper, climber, camera
 from wpilib.driverstation import DriverStation
 
-#robot experience -8g crosing the 2012 bump
+#robot experienc                                                                                                                                                                                                     e -8g crosing the 2012 bump
 
 class MyRobot(wpilib.SampleRobot):
     
@@ -26,12 +26,15 @@ class MyRobot(wpilib.SampleRobot):
         driveRightA = 3
         driveRightB = 4
         shooter = 1
-        arm = 5
-        pulley = 9
+        armLeft = 7
+        armRight = 8
+        pulley = 10
         tape = 0
-        queue = 7
+        queue = 9
         innerIntake = 6
-        outerIntake = 8
+        outerIntake = 5
+        
+        armPot = 3
     
     def robotInit(self):
         '''Robot initialization function'''
@@ -46,7 +49,7 @@ class MyRobot(wpilib.SampleRobot):
         self.shooter = shooter.Shooter(RobotMap.shooter)
         self.driveTrain = driveTrain.DriveTrain(RobotMap.driveLeftA,RobotMap.driveRightA,RobotMap.driveLeftB,RobotMap.driveRightB)
         self.queue = Queue(RobotMap.queue)
-        self.flipper = flipper.Flipper(RobotMap.arm)
+        self.flipper = flipper.Flipper(RobotMap.armLeft, RobotMap.armRight, RobotMap.armPot)
         self.climber = climber.Climber(RobotMap.pulley,RobotMap.tape)
         self.camera = camera.Camera()
         self.robotAccel = wpilib.BuiltInAccelerometer()
@@ -62,6 +65,9 @@ class MyRobot(wpilib.SampleRobot):
             
             oi.OI.refresh()
             
+            wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
+            wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.flipper.getPotValue())
+                                            
             wpilib.Timer.delay(0.005)
         
     def generate(self, stick, a, b=-1):
@@ -92,9 +98,11 @@ class MyRobot(wpilib.SampleRobot):
             if OI.drive_low.toBoolean():
                 driveFactor = 0.7
                 
-                
             self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
-            self.flipper.set(OI.flipper.toDouble() * 0.4)
+            if(abs(OI.flipper.toDouble()) > 0.25):
+                self.flipper.set(OI.flipper.toDouble() * 0.4)
+            else:
+                self.flipper.pid_stay()
             self.intake.set(-OI.intake.toDouble())
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
                 self.queue.set(-0.5)
