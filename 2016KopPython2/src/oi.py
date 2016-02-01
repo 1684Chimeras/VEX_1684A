@@ -53,6 +53,12 @@ class OI(object):
         OI.drive_low = InputOption.button(driver, OI.b)
         OI.driver_move = InputOption.axis(driver, OI.ry)
         OI.driver_rotate = InputOption.axis(driver, OI.lx)
+        
+        OI.arm_pid_off = InputOption.pov(operator, OI.south)
+        OI.arm_pid_up = InputOption.pov(operator, OI.north)
+        OI.arm_pid_hover = InputOption.pov(operator, OI.east)
+        OI.arm_pid_diag =InputOption.pov(operator, OI.west)
+        
     
     @staticmethod
     def initializeXboxSingleController():
@@ -69,6 +75,11 @@ class OI(object):
         
         OI.driver_move = InputOption.axis(joystick, OI.ry)
         OI.driver_rotate = InputOption.axis(joystick, OI.lx)
+        
+        OI.arm_pid_off = InputOption.pov(joystick, OI.south)
+        OI.arm_pid_up = InputOption.pov(joystick, OI.north)
+        OI.arm_pid_hover = InputOption.pov(joystick, OI.east)
+        OI.arm_pid_diag =InputOption.pov(joystick, OI.west)
     
     @staticmethod
     def initialize():

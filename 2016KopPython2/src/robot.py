@@ -22,19 +22,19 @@ class MyRobot(wpilib.SampleRobot):
     
     class RobotMap:
         driveLeftA = 1
-        driveLeftB = 2
-        driveRightA = 3
-        driveRightB = 4
+        driveLeftB = 1
+        driveRightA = 2
+        driveRightB = 2
         shooter = 1
         armLeft = 7
         armRight = 8
-        pulley = 10
+        pulley = 3
         tape = 0
         queue = 9
         innerIntake = 6
         outerIntake = 5
         
-        armPot = 3
+        armPot = 0
     
     def robotInit(self):
         '''Robot initialization function'''
@@ -53,6 +53,7 @@ class MyRobot(wpilib.SampleRobot):
         self.climber = climber.Climber(RobotMap.pulley,RobotMap.tape)
         self.camera = camera.Camera()
         self.robotAccel = wpilib.BuiltInAccelerometer()
+        self.wasFlipperSet = False
         
         
         self.shooterWasSet = False
@@ -91,6 +92,8 @@ class MyRobot(wpilib.SampleRobot):
         #4 - right trigger
         self.shooterSet = 0.0
         self.shooterWasSet = False
+        self.wasFlipperSet = True
+        
         while self.isOperatorControl() and self.isEnabled():
  
             driveFactor = 1
@@ -99,10 +102,31 @@ class MyRobot(wpilib.SampleRobot):
                 driveFactor = 0.7
                 
             self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
+            
+            #FLIPPER
             if(abs(OI.flipper.toDouble()) > 0.25):
                 self.flipper.set(OI.flipper.toDouble() * 0.4)
+                self.wasFlipperSet = True
             else:
-                self.flipper.pid_stay()
+                if self.wasFlipperSet:
+                    self.wasFlipperSet = False
+                    self.flipper.pid_lock()
+                
+                if OI.arm_pid_off.toBoolean():
+                    self.flipper.pid_goto(205)
+                
+                if OI.arm_pid_up.toBoolean():
+                    self.flipper.pid_goto(90)
+                    
+                if OI.arm_pid_hover.toBoolean():
+                    self.flipper.pid_goto(178)
+                    
+                if OI.arm_pid_diag.toBoolean():
+                    self.flipper.pid_goto(135)
+                    
+                self.flipper.pid_goto()
+                
+            #END FLIPPER CODE
             self.intake.set(-OI.intake.toDouble())
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
                 self.queue.set(-0.5)

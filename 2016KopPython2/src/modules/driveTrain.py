@@ -17,7 +17,10 @@ class DriveTrain(object):
         Constructor
         '''
     
-        self.robotDrive = wpilib.RobotDrive(leftDrive, leftB, rightDrive, rightB)
+        if leftDrive == leftB:
+            self.robotDrive = wpilib.RobotDrive(leftDrive, rightDrive)
+        else:
+            self.robotDrive = wpilib.RobotDrive(leftDrive, leftB, rightDrive, rightB)
         
         #self.robotDrive.setInvertedMotor(wpilib.RobotDrive.MotorType.kFrontLeft, True)
         #self.robotDrive.setInvertedMotor(wpilib.RobotDrive.MotorType.kRearRight, True)
