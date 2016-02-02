@@ -35,6 +35,7 @@ class MyRobot(wpilib.SampleRobot):
         outerIntake = 5
         
         armPot = 0
+        rotateGyro = 1
     
     def robotInit(self):
         '''Robot initialization function'''
@@ -45,9 +46,10 @@ class MyRobot(wpilib.SampleRobot):
         
         wpilib.DriverStation.reportError(oi.OI.newLine + "Robot Code Initialize", False)
      
+        self.robotGyro = wpilib.AnalogGyro(RobotMap.rotateGyro)
         self.intake = intake.Intake(RobotMap.innerIntake,RobotMap.outerIntake)
         self.shooter = shooter.Shooter(RobotMap.shooter)
-        self.driveTrain = driveTrain.DriveTrain(RobotMap.driveLeftA,RobotMap.driveRightA,RobotMap.driveLeftB,RobotMap.driveRightB)
+        self.driveTrain = driveTrain.DriveTrain(RobotMap.driveLeftA,RobotMap.driveRightA,RobotMap.driveLeftB,RobotMap.driveRightB, self.robotGyro)
         self.queue = Queue(RobotMap.queue)
         self.flipper = flipper.Flipper(RobotMap.armLeft, RobotMap.armRight, RobotMap.armPot)
         self.climber = climber.Climber(RobotMap.pulley,RobotMap.tape)
@@ -63,11 +65,12 @@ class MyRobot(wpilib.SampleRobot):
         print("Initialization Successfulrc")
     def disabled(self):
         while self.isDisabled():
-            
+            self.camera.processImage()
             oi.OI.refresh()
             
             wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
             wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.flipper.getPotValue())
+            wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
                                             
             wpilib.Timer.delay(0.005)
         
@@ -93,15 +96,24 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterSet = 0.0
         self.shooterWasSet = False
         self.wasFlipperSet = True
-        
+        self.wasRotatePID = False
         while self.isOperatorControl() and self.isEnabled():
- 
+            wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
+            self.camera.processImage()
+            #DRIVE TRAIN CODE
             driveFactor = 1
             
             if OI.drive_low.toBoolean():
                 driveFactor = 0.7
                 
-            self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
+            if OI.rotate_pid.toBoolean():
+                if not self.wasRotatePID:
+                    self.wasRotatePID = True
+                    self.driveTrain.pid_rotate(self.camera.getRotationOffset())
+                self.driveTrain.pid_periodic()
+            else:
+                self.wasRotatePID = False
+                self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
             
             #FLIPPER
             if(abs(OI.flipper.toDouble()) > 0.25):

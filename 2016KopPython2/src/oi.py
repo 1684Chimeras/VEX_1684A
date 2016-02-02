@@ -49,6 +49,7 @@ class OI(object):
         OI.pulley = InputOption.axis(operator, OI.ly)
         OI.tape = InputOption.axis(operator, OI.ry)
         OI.flipper = InputOption.triggers(operator)
+        OI.rotate_pid = InputOption.button(driver, OI.b)
         
         OI.drive_low = InputOption.button(driver, OI.b)
         OI.driver_move = InputOption.axis(driver, OI.ry)

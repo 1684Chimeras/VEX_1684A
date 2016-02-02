@@ -5,6 +5,8 @@ Created on Jan 16, 2016
 '''
 
 import wpilib
+from email._header_value_parser import AngleAddr
+from wpilib.smartdashboard import SmartDashboard
 
 class DriveTrain(object):
     '''
@@ -12,18 +14,41 @@ class DriveTrain(object):
     '''
 
 
-    def __init__(self, leftDrive, rightDrive, leftB, rightB):
+    def __init__(self, leftDrive, rightDrive, leftB, rightB, gyro):
         '''
         Constructor
         '''
-    
+        self.gyro = gyro
         if leftDrive == leftB:
             self.robotDrive = wpilib.RobotDrive(leftDrive, rightDrive)
         else:
             self.robotDrive = wpilib.RobotDrive(leftDrive, leftB, rightDrive, rightB)
-        
+        self.setpoint = 0
         #self.robotDrive.setInvertedMotor(wpilib.RobotDrive.MotorType.kFrontLeft, True)
         #self.robotDrive.setInvertedMotor(wpilib.RobotDrive.MotorType.kRearRight, True)
+        
+    def pid_rotate(self, angle):
+        self.setpoint = angle
+        self.integral_accum = 0
+        self.gyro.reset()
+        
+    def pid_calc_error(self):
+        return self.setpoint - self.gyro.getAngle()
+    #GOOD VALUES - 0.03, 0.1 worked with a ~11.8v battery
+    def pid_periodic(self):
+        const_kP = 0.043
+        const_kI = 3
+        error = self.pid_calc_error()
+        self.integral_accum = self.integral_accum + (min(1, max(-1, error)) * 0.005)
+        if (self.integral_accum > 0 and error < 0) or (self.integral_accum < 0 and error > 0):
+            self.integral_accum = 0
+        SmartDashboard.putNumber("Integral Accum", self.integral_accum)
+        SmartDashboard.putNumber("Drive Pid Error", error)
+        SmartDashboard.putNumber("Drive Pid Setpoint", self.setpoint)
+        kP = min(0.4, max(-0.4, const_kP * error))
+        kI = const_kI * self.integral_accum
+        SmartDashboard.putNumber("Drive kI", kI)
+        self.arcadeDrive(0, -(kP + kI))
         
     def arcadeDrive(self, move, rotate):
         if abs(move) > 0.98:
