@@ -46,6 +46,7 @@ class MyRobot(wpilib.SampleRobot):
         
         wpilib.DriverStation.reportError(oi.OI.newLine + "Robot Code Initialize", False)
      
+        oi.OI.initialize()
         self.robotGyro = wpilib.AnalogGyro(RobotMap.rotateGyro)
         self.intake = intake.Intake(RobotMap.innerIntake,RobotMap.outerIntake)
         self.shooter = shooter.Shooter(RobotMap.shooter)
@@ -61,7 +62,6 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterWasSet = False
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
-        oi.OI.initialize()
         print("Initialization Successfulrc")
     def disabled(self):
         while self.isDisabled():
@@ -117,7 +117,7 @@ class MyRobot(wpilib.SampleRobot):
             
             #FLIPPER
             if(abs(OI.flipper.toDouble()) > 0.25):
-                self.flipper.set(OI.flipper.toDouble() * 0.4)
+                self.flipper.set(OI.flipper.toDouble() * 0.5)
                 self.wasFlipperSet = True
             else:
                 if self.wasFlipperSet:

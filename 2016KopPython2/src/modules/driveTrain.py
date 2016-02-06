@@ -39,24 +39,26 @@ class DriveTrain(object):
     #semi good - 0.043, 3, 0.3
     def pid_periodic(self):
         const_kP = 0.023
-        const_kI = 0.8
-        const_kFF = 0.34
+        const_kI = 0.6
+        const_kFF = 0.24
         error = self.pid_calc_error()
         ##if error < 5:
         #    const_kI = 1.66 - (error / 6)
         self.integral_accum = self.integral_accum + (min(1, max(-1, error)) * 0.005)
         if (self.integral_accum > 0 and error < 0) or (self.integral_accum < 0 and error > 0):
             self.integral_accum = 0
-        SmartDashboard.putNumber("Integral Accum", self.integral_accum)
-        SmartDashboard.putNumber("Drive Pid Error", error)
-        SmartDashboard.putNumber("Drive Pid Setpoint", self.setpoint)
         kP = min(0.4, max(-0.4, const_kP * error))
         kI = const_kI * self.integral_accum
         #kI = kI * kI * 1.0 if kI > 0 else -1.0
-        kFF = const_kFF * 1.0 if error > 0 else -1.0
+        kFF = const_kFF * (1.0 if error > 0 else -1.0)
         SmartDashboard.putNumber("Drive kI", kI)
         SmartDashboard.putNumber("Drive kP", kP)
-        self.arcadeDrive(0, -(kP + kI))
+        SmartDashboard.putNumber("Drive kFF", kFF)
+        SmartDashboard.putNumber("Integral Accum", self.integral_accum)
+        SmartDashboard.putNumber("Drive Pid Error", error)
+        SmartDashboard.putNumber("Drive Pid Setpoint", self.setpoint)
+        SmartDashboard.putNumber("Total", -(kP + kI + kFF))
+        self.arcadeDrive(0, -(kP + kI + kFF))
         
     def arcadeDrive(self, move, rotate):
         if abs(move) > 0.98:

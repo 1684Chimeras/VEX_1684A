@@ -85,6 +85,11 @@ class OI(object):
         OI.arm_pid_diag =InputOption.pov(joystick, OI.west)
     
     @staticmethod
+    def driverVibrate(left,right):
+        OI.joy0.setRumble(OI.joy0.RumbleType.kLeftRumble_val, left)
+        OI.joy0.setRumble(OI.joy0.RumbleType.kRightRumble_val, right)
+    
+    @staticmethod
     def initialize():
         OI.joy0 = wpilib.Joystick(0)
         OI.joy1 = wpilib.Joystick(1)

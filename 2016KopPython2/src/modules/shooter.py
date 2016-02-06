@@ -7,6 +7,7 @@ Created on Jan 16, 2016
 import wpilib
 import time
 import _thread
+import oi
 
 class Shooter(object):
     '''
@@ -14,7 +15,7 @@ class Shooter(object):
     '''
 
 
-    def __init__(self,  params):
+    def __init__(self,params):
         '''
         Constructor
         '''
@@ -57,7 +58,7 @@ class Shooter(object):
                 self.set(self.speed)
                 
             time.sleep(0.005)
-    
+    timeToSpin = 5.33
     def set(self, value):
         if(value > 0.1 or value < -0.1):
             if(self.wasBrake):
@@ -69,10 +70,15 @@ class Shooter(object):
                 self.motor.enableBrakeMode(True)
         if value != 0:
             if self.lastToggleTime + Shooter.timeToFire > time.time():
-                print("FULL SPEED")
                 self.motor.set(self.voltageSetpoint)
             else:
-                print("MEH SPEED")
+                if self.lastToggleTime + Shooter.timeToSpin < time.time():
+                    #print("yes {} {}".format(self.lastToggleTime, time.time()))
+                    oi.OI.driverVibrate(0.7,0.7)
+                else:
+                    #print("no {} {}".format(self.lastToggleTime, time.time()))
+                    oi.OI.driverVibrate(0,0)
                 self.motor.set(value * self.voltageSetpoint)
         else:
+            oi.OI.driverVibrate(0,0)
             self.motor.set(value * self.voltageSetpoint)
