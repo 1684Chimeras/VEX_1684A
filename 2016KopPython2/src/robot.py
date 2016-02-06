@@ -139,7 +139,12 @@ class MyRobot(wpilib.SampleRobot):
                 self.flipper.pid_goto()
                 
             #END FLIPPER CODE
-            self.intake.set(-OI.intake.toDouble())
+            
+            #INTAKE
+            if OI.outer_arm_only.toBoolean():
+                self.intake.set(-OI.intake.toDouble(), -1)
+            else:
+                self.intake.set(-OI.intake.toDouble())
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
                 self.queue.set(-0.5)
             else: #time to shot- 4sec

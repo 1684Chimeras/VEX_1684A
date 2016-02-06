@@ -44,16 +44,17 @@ class OI(object):
         
         OI.intake = InputOption.triggers(driver)
         #OI.intake = InputOption.buttons(driver, OI.b, OI.x)
-        OI.queue = InputOption.buttons(driver, OI.y, OI.a)
-        OI.shooter = InputOption.buttons(driver, OI.rb, OI.lb)
+        OI.queue = InputOption.buttons(driver, OI.lb, OI.a)
+        OI.shooter = InputOption.button(driver, OI.rb)
         OI.pulley = InputOption.axis(operator, OI.ly)
         OI.tape = InputOption.axis(operator, OI.ry)
         OI.flipper = InputOption.triggers(operator)
         OI.rotate_pid = InputOption.button(driver, OI.b)
+        OI.outer_arm_only = InputOption.button(driver, OI.x)
         
         OI.drive_low = InputOption.button(driver, OI.b)
-        OI.driver_move = InputOption.axis(driver, OI.ry)
-        OI.driver_rotate = InputOption.axis(driver, OI.lx)
+        OI.driver_move = InputOption.axis(driver, OI.ly)
+        OI.driver_rotate = InputOption.axis(driver, OI.rx)
         
         OI.arm_pid_off = InputOption.pov(operator, OI.south)
         OI.arm_pid_up = InputOption.pov(operator, OI.north)
@@ -73,6 +74,7 @@ class OI(object):
         OI.tape = InputOption.pov(joystick, OI.north, OI.south)
         OI.flipper = InputOption.triggers(joystick)
         OI.drive_low = InputOption.button(joystick, OI.x)
+        OI.outer_arm_only = InputOption.button(joystick, OI.x)
         
         OI.driver_move = InputOption.axis(joystick, OI.ry)
         OI.driver_rotate = InputOption.axis(joystick, OI.lx)

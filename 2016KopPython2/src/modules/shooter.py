@@ -24,6 +24,7 @@ class Shooter(object):
         self.motor.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
         self.wasBrake = True
         self.toggleState = False
+        self.lastToggleTime = 0
         self.speed = 0
         _thread.start_new_thread( self.periodic, ("Shooter-Update-Thread", "literally nothing",))
         
@@ -33,10 +34,11 @@ class Shooter(object):
     
     def disable(self):
         self.speed = 0
-    
+    timeToFire = 2
     def changeOnToggle(self, value):
         if abs(value) > 0.5:
             if not self.toggleState:
+                self.lastToggleTime = time.time()
                 self.speed = 1 - self.speed
             self.toggleState = True
         else:
@@ -65,5 +67,12 @@ class Shooter(object):
             if(not self.wasBrake):
                 self.wasBrake = True
                 self.motor.enableBrakeMode(True)
-        
-        self.motor.set(value * self.voltageSetpoint)
+        if value != 0:
+            if self.lastToggleTime + Shooter.timeToFire > time.time():
+                print("FULL SPEED")
+                self.motor.set(self.voltageSetpoint)
+            else:
+                print("MEH SPEED")
+                self.motor.set(value * self.voltageSetpoint)
+        else:
+            self.motor.set(value * self.voltageSetpoint)
