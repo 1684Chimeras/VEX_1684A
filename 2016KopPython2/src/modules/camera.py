@@ -5,6 +5,8 @@ Created on Jan 23, 2016
 '''
 
 import wpilib
+import subprocess
+import _thread
 from networktables import NetworkTable
 from networktables import NumberArray
 
@@ -65,12 +67,21 @@ class Camera(object):
     
     def getZOffset(self):
         return 0.0
+    
+    def startProcess(self):
+        subprocess.call(["/usr/local/frc/JRE/bin/java", "-jar", "/home/lvuser/grip.jar", "/home/lvuser/project.grip"])
 
     def __init__(self):
         '''
         Constructor
         '''
+        #start GRIP
+        _thread.start_new_thread( self.startProcess, ("Grip-Thread", "literally nothing",))
+        
         self.largestArea = 0
         self.largestIndex = -1
+        print("Setting IP Address...")
+        NetworkTable.setIPAddress("localhost")
+        print("Getting Table...")
         self.table = NetworkTable.getTable("/GRIP/targetDetection")
-        
+        print("Done!")

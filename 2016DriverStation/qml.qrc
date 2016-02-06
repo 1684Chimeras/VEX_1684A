@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>main.js</file>
+        <file>ControlMenuWidget.qml</file>
+        <file>MenuWidgetOption.qml</file>
+        <file>exclamation.png</file>
+        <file>EditingMenuHostWidget.qml</file>
+        <file>DriverStationScene.qml</file>
+        <file>AutonConfigScene.qml</file>
+        <file>ControllerSetupScene.qml</file>
+        <file>auto.png</file>
+        <file>config.png</file>
+        <file>drivestation.png</file>
+    </qresource>
+</RCC>
