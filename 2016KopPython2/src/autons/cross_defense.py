@@ -1,7 +1,7 @@
 import wpilib
-import _base_auton
+import autons._base_auton
 
-class CrossDefense(_base_auton.BaseAutonRoutine):
+class CrossDefense(autons._base_auton.BaseAutonRoutine):
 
     def getPriority(self):
         return

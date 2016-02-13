@@ -1,9 +1,9 @@
 import wpilib
-import _base_auton 
 
-from subroutines import drive, shoot, spin #@UnresolvedImport
-
-class CrossAndScore(_base_auton.BaseAutonRoutine):
+from autons.subroutines import drive, shoot, run_intake, targeting, auto_shoot, spin #@UnresolvedImport
+import autons._base_auton
+import time
+class CrossAndScore():
 
     class OuterWorksType:
         cheval_de_frise = 0
@@ -14,6 +14,7 @@ class CrossAndScore(_base_auton.BaseAutonRoutine):
         rough_terrain = 5
         bump = 6
         ramparts = 7
+
         
     class OuterWorksPosition:
         leftmost = 1
@@ -22,6 +23,9 @@ class CrossAndScore(_base_auton.BaseAutonRoutine):
         right = 4
         rightmost = 5
         
+    def __init__(self):
+        self.type = 0
+        self.position = 0
         
     def positionToString(self, position):        
         return "undefined"
@@ -45,7 +49,31 @@ class CrossAndScore(_base_auton.BaseAutonRoutine):
         return "Attempts to cross the goal and score.\r\n\r\nCurrent Position: " + self.positionToString(self.position) + "\r\nCurrent Defense Type: " + self.typeToString(self.type)
         
     def periodic(self):
-        return
+        if self.type == self.OuterWorksType.cheval_de_frise:
+            if self.driveStage.isFinished():
+                self.intakeInitialStage.terminate()
+                if self.timeoutMark == -1:
+                    self.timeoutMark = time.time()
+                if self.timeoutMark + 2 < time.time():
+                    self.targeting.run()
+                    self.autoshoot.run()
+            else:
+                self.driveStage.run()
+                
+                self.intakeInitialStage.run()
+            return
+        else:
+            return
     
-    def initialize(self):
-        return
+    def initialize(self, defense, position):
+        self.type = defense
+        self.position = position
+        if self.type == self.OuterWorksType.cheval_de_frise:
+            self.driveStage = drive.DriveRoutine(0.73, 0.3,  timeout=2.7)
+            self.intakeInitialStage = run_intake.IntakeRoutine(-1)
+            self.targeting = targeting.TargetingRoutine()
+            self.autoshoot = auto_shoot.AutomaticShootingRoutine(self.targeting)
+            self.timeoutMark = -1
+            return
+        else:
+            return

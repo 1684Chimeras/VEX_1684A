@@ -27,4 +27,4 @@ class Subroutine:
     def execute(self):
         if self.isFinished():
             if self.queue:
-                
+                return

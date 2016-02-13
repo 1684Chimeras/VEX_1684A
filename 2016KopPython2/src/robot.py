@@ -12,9 +12,12 @@
 
 import wpilib 
 import oi
+import time
 from modules.queuee import Queue
 from modules import driveTrain, intake, shooter, flipper, climber, camera
 from wpilib.driverstation import DriverStation
+from networktables import NetworkTable
+from auton_manager import AutonManager
 
 #robot experienc                                                                                                                                                                                                     e -8g crosing the 2012 bump
 
@@ -49,16 +52,40 @@ class MyRobot(wpilib.SampleRobot):
         oi.OI.initialize()
         self.robotGyro = wpilib.AnalogGyro(RobotMap.rotateGyro)
         self.intake = intake.Intake(RobotMap.innerIntake,RobotMap.outerIntake)
-        self.shooter = shooter.Shooter(RobotMap.shooter)
+        self.camera = camera.Camera()
         self.driveTrain = driveTrain.DriveTrain(RobotMap.driveLeftA,RobotMap.driveRightA,RobotMap.driveLeftB,RobotMap.driveRightB, self.robotGyro)
         self.queue = Queue(RobotMap.queue)
         self.flipper = flipper.Flipper(RobotMap.armLeft, RobotMap.armRight, RobotMap.armPot)
         self.climber = climber.Climber(RobotMap.pulley,RobotMap.tape)
-        self.camera = camera.Camera()
+        self.shooter = shooter.Shooter(self.camera,self.driveTrain, RobotMap.shooter)
         self.robotAccel = wpilib.BuiltInAccelerometer()
         self.wasFlipperSet = False
+        self.auto_manager = AutonManager(self.climber, self.driveTrain, self.flipper, self.intake, self.queue, self.shooter, self.camera)
+        time.auton_start = 0
         
-        
+        self.mode = wpilib.SendableChooser()
+        self.mode.addDefault("Do Nothing", 0)
+        self.mode.addObject("Cross And Score", 1)
+        self.mode.addObject("Cross", 2)
+        self.mode.addObject("Score", 3)
+        self.defense = wpilib.SendableChooser()
+        self.defense.addDefault("Cheval de Frise", 0)
+        self.defense.addObject("Drawbridge", 1)
+        self.defense.addObject("Guillotine", 2)
+        self.defense.addObject("Moat", 3)
+        self.defense.addObject("Sally Port", 4)
+        self.defense.addObject("Rough Terrain", 5)
+        self.defense.addObject("Bump", 6)
+        self.defense.addObject("Ramparts", 7)
+        self.defensePosition = wpilib.SendableChooser()
+        self.defensePosition.addDefault("Leftmost", 1)
+        self.defensePosition.addObject("Left", 2)
+        self.defensePosition.addObject("Middle", 3)
+        self.defensePosition.addObject("Right", 4)
+        self.defensePosition.addObject("Rightmost", 5)
+        wpilib.SmartDashboard.putData("Mode", self.mode)
+        wpilib.SmartDashboard.putData("Defense", self.defense)
+        wpilib.SmartDashboard.putData("Defense Position", self.defensePosition)
         self.shooterWasSet = False
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
@@ -67,7 +94,6 @@ class MyRobot(wpilib.SampleRobot):
         while self.isDisabled():
             self.camera.processImage()
             oi.OI.refresh()
-            
             wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
             wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.flipper.getPotValue())
             wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
@@ -87,6 +113,14 @@ class MyRobot(wpilib.SampleRobot):
             return (val - 0.1) / 0.9
         else:
             return (val + 0.1) / 0.9
+        
+    def autonomous(self):
+        time.auton_start = time.time()
+        self.auto_manager.autonomousInit(self.mode.getSelected(), self.defense.getSelected(), self.defensePosition.getSelected())
+        while(self.isAutonomous() and self.isEnabled()):
+            self.camera.processImage()
+            self.auto_manager.autonomousPeriodic()
+            wpilib.Timer.delay(0.005)
         
     def operatorControl(self):
         '''Runs the motors with tank steering'''
@@ -110,7 +144,7 @@ class MyRobot(wpilib.SampleRobot):
                 if not self.wasRotatePID:
                     self.wasRotatePID = True
                     self.driveTrain.pid_rotate(self.camera.getRotationOffset())
-                self.driveTrain.pid_periodic()
+                self.driveTrain.pid_periodic(-OI.driver_move.toDouble())
             else:
                 self.wasRotatePID = False
                 self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
@@ -222,4 +256,6 @@ class MyRobot(wpilib.SampleRobot):
             wpilib.Timer.delay(0.005) # wait for a motor update time
             
 if __name__ == '__main__':
+    
+     #NetworkTable.setIPAddress("localhost")
      wpilib.run(MyRobot)

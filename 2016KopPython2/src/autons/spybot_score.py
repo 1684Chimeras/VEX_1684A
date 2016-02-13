@@ -1,7 +1,7 @@
 import wpilib 
-import _base_auton
+import autons._base_auton
 
-class SpybotScore(_base_auton.BaseAutonRoutine):
+class SpybotScore(autons._base_auton.BaseAutonRoutine):
 
     def getPriority(self):
         return

@@ -16,7 +16,7 @@ class Camera(object):
     '''
     camera_width = 320
     camera_height = 240
-    center_x = 144
+    center_x = 152
     center_y = 137
     angle_of_camera = 67
     degrees_per_x_error = -angle_of_camera / camera_width
@@ -49,6 +49,7 @@ class Camera(object):
                 wpilib.SmartDashboard.putNumber("Y Error", self.center_y - y[self.largestIndex])
                 
                 self.rotateError = self.degrees_per_x_error * (self.center_x - x[self.largestIndex])
+                self.y = y[self.largestIndex]
             return
         except KeyError:
             return
@@ -59,8 +60,8 @@ class Camera(object):
         
         return
     
-    def getPixelYOffset(self):
-        return
+    def getY(self):
+        return self.y / self.camera_height
     
     def getRotationOffset(self):
         return self.rotateError
@@ -68,20 +69,21 @@ class Camera(object):
     def getZOffset(self):
         return 0.0
     
-    def startProcess(self):
+    def startProcess(self, literally, nothing):
+        print("CALL BEGIN")
         subprocess.call(["/usr/local/frc/JRE/bin/java", "-jar", "/home/lvuser/grip.jar", "/home/lvuser/project.grip"])
+        print("CALL END")
 
     def __init__(self):
         '''
         Constructor
         '''
         #start GRIP
-        _thread.start_new_thread( self.startProcess, ("Grip-Thread", "literally nothing",))
+        #_thread.start_new_thread( self.startProcess, ("Grip-Thread", "literally nothing",))
         
         self.largestArea = 0
         self.largestIndex = -1
-        print("Setting IP Address...")
-        NetworkTable.setIPAddress("localhost")
-        print("Getting Table...")
+        #print("Setting IP Address...")
+        #print("Getting Table...")
         self.table = NetworkTable.getTable("/GRIP/targetDetection")
-        print("Done!")
+        #print("Done!")

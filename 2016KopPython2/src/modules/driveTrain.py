@@ -20,6 +20,7 @@ class DriveTrain(object):
         Constructor
         '''
         self.gyro = gyro
+        self.max_error = 0.4
         if leftDrive == leftB:
             self.robotDrive = wpilib.RobotDrive(leftDrive, rightDrive)
         else:
@@ -29,6 +30,7 @@ class DriveTrain(object):
         #self.robotDrive.setInvertedMotor(wpilib.RobotDrive.MotorType.kRearRight, True)
         
     def pid_rotate(self, angle):
+        print("ROtate to angle {}".format(angle))
         self.setpoint = angle
         self.integral_accum = 0
         self.gyro.reset()
@@ -37,10 +39,13 @@ class DriveTrain(object):
         return self.setpoint - self.gyro.getAngle()
     #GOOD VALUES - 0.03, 0.1 worked with a ~11.8v battery
     #semi good - 0.043, 3, 0.3
-    def pid_periodic(self):
+    
+    def ready_to_shoot(self):
+        return abs(self.pid_calc_error()) < self.max_error
+    def pid_periodic(self,move):
         const_kP = 0.023
         const_kI = 0.6
-        const_kFF = 0.24
+        const_kFF = 0.29
         error = self.pid_calc_error()
         ##if error < 5:
         #    const_kI = 1.66 - (error / 6)
@@ -58,7 +63,7 @@ class DriveTrain(object):
         SmartDashboard.putNumber("Drive Pid Error", error)
         SmartDashboard.putNumber("Drive Pid Setpoint", self.setpoint)
         SmartDashboard.putNumber("Total", -(kP + kI + kFF))
-        self.arcadeDrive(0, -(kP + kI + kFF))
+        self.arcadeDrive(move, -(kP + kI + kFF))
         
     def arcadeDrive(self, move, rotate):
         if abs(move) > 0.98:

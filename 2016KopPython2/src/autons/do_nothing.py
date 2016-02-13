@@ -1,7 +1,7 @@
 import wpilib 
-import _base_auton
+import autons._base_auton
 
-class DoNothing(_base_auton.BaseAutonRoutine):
+class DoNothing(autons._base_auton.BaseAutonRoutine):
 
     def getPriority(self):
         return 0

@@ -10,19 +10,19 @@
       <grip:Input step="0" socket="1">
         <value>
           <double>63.129496402877706</double>
-          <double>101.21212121212123</double>
+          <double>95.15151515151514</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="2">
         <value>
-          <double>174.28057553956833</double>
-          <double>255.0</double>
+          <double>94.01978417266186</double>
+          <double>173.43434343434345</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="3">
         <value>
-          <double>176.57374100719423</double>
-          <double>255.0</double>
+          <double>110.9892086330935</double>
+          <double>188.45959595959593</double>
         </value>
       </grip:Input>
       <grip:Output step="0" socket="0" previewed="true"/>
@@ -115,18 +115,6 @@
   </steps>
   <connections>
     <grip:Connection>
-      <grip:Output step="0" socket="0" previewed="true"/>
-      <grip:Input step="1" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
-      <grip:Output step="4" socket="0" previewed="true"/>
-      <grip:Input step="5" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
-      <grip:Output source="0" socket="0" previewed="true"/>
-      <grip:Input step="0" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
       <grip:Output step="3" socket="0" previewed="false"/>
       <grip:Input step="4" socket="0"/>
     </grip:Connection>
@@ -138,10 +126,22 @@
       <grip:Output step="2" socket="0" previewed="true"/>
       <grip:Input step="3" socket="0"/>
     </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="0" socket="0" previewed="true"/>
+      <grip:Input step="0" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="4" socket="0" previewed="true"/>
+      <grip:Input step="5" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="0" socket="0" previewed="true"/>
+      <grip:Input step="1" socket="0"/>
+    </grip:Connection>
   </connections>
   <settings>
     <teamNumber>1684</teamNumber>
-    <publishAddress></publishAddress>
+    <publishAddress>roborio-1684-frc.local</publishAddress>
     <deployAddress>roborio-1684-frc.local</deployAddress>
     <deployDir>/home/lvuser</deployDir>
     <deployUser>lvuser</deployUser>
