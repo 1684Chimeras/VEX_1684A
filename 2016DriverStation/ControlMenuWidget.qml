@@ -55,11 +55,11 @@ Item {
             x: 0;
             y: 0;
 
-            color: "#000000";
+            color: "#ff0000";
             height: 3000;
             width: movableContents.width;
 
-            opacity: 0.1;
+            opacity: 0.4;
         }
 
         MenuWidgetOption{

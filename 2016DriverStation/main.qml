@@ -12,6 +12,7 @@ import "main.js" as Main
 //RIO Setup (+ CAN setup)
 //Settings
 
+//idea for a window - PDP window - shows current draw of all channels
 ApplicationWindow {
     visible: true
     width: 640
@@ -24,6 +25,7 @@ ApplicationWindow {
         setWidth(1366);
         setX(0);
         setY(0);
+        Main.setWindow(window, content);
     }
 
     Component.onCompleted: startupFunction();
@@ -32,7 +34,7 @@ ApplicationWindow {
     Rectangle {
         id: background;
 
-        color: "#8A2BE2";
+        color: "#000000";
 
         width: 9999;
         height: 9999;
@@ -45,7 +47,7 @@ ApplicationWindow {
         height: 566
 
         Label {
-            text: "This is a test";
+            text: "NOT CONNECTED";
             anchors.centerIn: parent
             font.bold: true;
             font.pixelSize: 96;

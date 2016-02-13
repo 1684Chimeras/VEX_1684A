@@ -62,12 +62,19 @@ class CrossAndScore():
                 
                 self.intakeInitialStage.run()
             return
+        elif self.useGenericRun:
+            return
         else:
             return
     
     def initialize(self, defense, position):
         self.type = defense
         self.position = position
+        self.useGenericRun = False
+        rammingSpeed = 0.9
+        rammingSpeedTimeout = 3
+        bindRight = -0.3
+        
         if self.type == self.OuterWorksType.cheval_de_frise:
             self.driveStage = drive.DriveRoutine(0.73, 0.3,  timeout=2.7)
             self.intakeInitialStage = run_intake.IntakeRoutine(-1)
@@ -75,5 +82,26 @@ class CrossAndScore():
             self.autoshoot = auto_shoot.AutomaticShootingRoutine(self.targeting)
             self.timeoutMark = -1
             return
-        else:
-            return
+        elif self.type == self.OuterWorksType.moat:
+            self.useGenericRun = True
+            self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
+        elif self.type == self.OuterWorksType.bump:
+            self.useGenericRun = True
+        elif self.type == self.OuterWorksType.drawbridge:
+            self.useGenericRun = True
+        elif self.type == self.OuterWorksType.guillotine:
+            self.useGenericRun = True
+        elif self.type == self.OuterWorksType.ramparts:
+            self.useGenericRun = True
+        elif self.type == self.OuterWorksType.rough_terrain:
+            self.useGenericRun = True
+        elif self.type == self.OuterWorksType.sally_port:
+            self.useGenericRun = True
+            
+        if self.useGenericRun:
+            if not hasattr(self, 'driveStage'):
+                self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
+            self.targeting = targeting.targetingRoutine()
+            self.autoshoot = auto_shoot.AutomaticShootingRoutine(self.targeting)
+        
+            

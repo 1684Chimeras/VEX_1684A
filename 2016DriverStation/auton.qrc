@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Auton/cheval_de_frise.png</file>
+        <file>Auton/drawbridge.png</file>
+        <file>Auton/moat.png</file>
+        <file>Auton/portcullis.png</file>
+        <file>Auton/ramparts.png</file>
+        <file>Auton/rock_wall.png</file>
+        <file>Auton/rough_terrain.png</file>
+        <file>Auton/sally_port.png</file>
+        <file>Auton/PositionSelectorWidget.qml</file>
+        <file>Auton/PositionSelectorButton.qml</file>
+    </qresource>
+</RCC>

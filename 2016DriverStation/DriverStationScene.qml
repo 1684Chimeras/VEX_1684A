@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.4
 //center : 350x350 circle
 //edges - 800 long
 //blue aura - FMS
@@ -11,7 +12,12 @@ import QtQuick 2.0
 
 Item {
     id: scene;
+    width: 1366;
+    height: 566;
     property double angle: 250;
+    Label{
+        text: "Theres nothing here?"
+    }
 
     Item{
         id: auras;

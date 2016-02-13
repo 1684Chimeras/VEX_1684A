@@ -1,11 +1,13 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 
+#include <vlc-qt/include/VLCQtCore/Common.h>
+
 int main(int argc, char *argv[])
 {
 
     QApplication app(argc, argv);
-
+    //VlcCommon::setPluginPath(app.applicationDirPath() + "/plugins");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

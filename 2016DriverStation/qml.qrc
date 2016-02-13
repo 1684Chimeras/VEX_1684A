@@ -12,5 +12,10 @@
         <file>auto.png</file>
         <file>config.png</file>
         <file>drivestation.png</file>
+        <file>controls_background.png</file>
+        <file>controllers.js</file>
+        <file>PDPScene.qml</file>
+        <file>PDP/InputOption.qml</file>
+        <file>DefenseTypeButton.qml</file>
     </qresource>
 </RCC>

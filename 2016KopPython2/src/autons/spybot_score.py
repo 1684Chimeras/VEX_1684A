@@ -15,5 +15,5 @@ class SpybotScore(autons._base_auton.BaseAutonRoutine):
     def periodic(self):
         return
     
-    def initialize(self):
+    def initialize(self, defense, position):
         return
