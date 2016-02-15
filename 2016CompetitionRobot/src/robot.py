@@ -42,7 +42,6 @@ class MyRobot(wpilib.SampleRobot):
     
     def robotInit(self):
         '''Robot initialization function'''
-        print("Initialization Started")
         # object that handles basic drive operations
         #hello from github
         RobotMap = self.RobotMap
@@ -90,7 +89,7 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterWasSet = False
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
-        print("Initialization Successfulrc")
+      
     def disabled(self):
         while self.isDisabled():
             self.camera.processImage()
@@ -151,7 +150,8 @@ class MyRobot(wpilib.SampleRobot):
                 self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
             
             #FLIPPER
-            if(abs(OI.flipper.toDouble()) > 0.25):
+            #TODO - Re-insert PID to flipper
+            if(abs(OI.flipper.toDouble()) > 0.25) or True:
                 self.flipper.set(OI.flipper.toDouble() * 0.5)
                 self.wasFlipperSet = True
             else:
