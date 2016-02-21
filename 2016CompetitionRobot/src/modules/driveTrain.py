@@ -36,13 +36,13 @@ class DriveTrain(object):
         self.setpoint = 0
         
     def pid_rotate(self, angle):
-        print("ROtate to angle {}".format(angle))
         self.setpoint = angle
         self.integral_accum = 0
         self.gyro.reset()
         
     def pid_calc_error(self):
         return self.setpoint - self.gyro.getAngle()
+    
     #GOOD VALUES - 0.03, 0.1 worked with a ~11.8v battery
     #semi good - 0.043, 3, 0.3
     
@@ -69,7 +69,7 @@ class DriveTrain(object):
         SmartDashboard.putNumber("Drive Pid Error", error)
         SmartDashboard.putNumber("Drive Pid Setpoint", self.setpoint)
         SmartDashboard.putNumber("Total", -(kP + kI + kFF))
-        self.arcadeDrive(move, -(kP + kI + kFF))
+        self.arcadeDrive(move, -(kP + kI + kFF), False, 10)
         
         
     def arcadeDrive(self, move, rotate, squaredInputs=True, voltage=12):
@@ -84,4 +84,40 @@ class DriveTrain(object):
             else:
                 rotate = -1
 
-        self.robotDrive.arcadeDrive(move, rotate, True)
+        if squaredInputs:
+            # square the inputs (while preserving the sign) to increase fine
+            # control while permitting full power
+            if move >= 0.0:
+                move = (move * move)
+            else:
+                move = -(move * move)
+            if rotate >= 0.0:
+                rotateValue = (rotate * rotate)
+            else:
+                rotateValue = -(rotate * rotate)
+
+        leftMotorSpeed = 0
+        rightMotorSpeed = 0
+        
+        if move > 0.0:
+            if rotateValue > 0.0:
+                leftMotorSpeed = move - rotate
+                rightMotorSpeed = max(move, rotate)
+            else:
+                leftMotorSpeed = max(move, -rotate)
+                rightMotorSpeed = move + rotate
+        else:
+            if rotateValue > 0.0:
+                leftMotorSpeed = -max(-move, rotate)
+                rightMotorSpeed = move + rotate
+            else:
+                leftMotorSpeed = move - rotate
+                rightMotorSpeed = -max(-move, -rotate)
+        
+        self.left.set(leftMotorSpeed * voltage)
+        self.rightB.set(-rightMotorSpeed * voltage)
+        
+        try:
+            self.leftb.set(leftMotorSpeed * voltage)
+            self.rightB.set(-rightMotorSpeed * voltage)
+        except: pass
