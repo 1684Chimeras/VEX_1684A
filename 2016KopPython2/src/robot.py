@@ -58,7 +58,7 @@ class MyRobot(wpilib.SampleRobot):
         self.flipper = flipper.Flipper(RobotMap.armLeft, RobotMap.armRight, RobotMap.armPot)
         self.climber = climber.Climber(RobotMap.pulley,RobotMap.tape)
         self.shooter = shooter.Shooter(self.camera,self.driveTrain, RobotMap.shooter)
-        self.newEncoder = wpilib.SPI(1)
+        #self.newEncoder = wpilib.SPI(1)
         self.robotAccel = wpilib.BuiltInAccelerometer()
         self.wasFlipperSet = False
         self.auto_manager = AutonManager(self.climber, self.driveTrain, self.flipper, self.intake, self.queue, self.shooter, self.camera)

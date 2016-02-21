@@ -1,7 +1,7 @@
 <grip:Pipeline>
   <sources>
     <grip:Camera>
-      <property name="address" value="http://axis-camera.local/mjpg/video.mjpg"/>
+      <property name="address" value="http://10.16.84.130"/>
     </grip:Camera>
   </sources>
   <steps>
@@ -9,20 +9,20 @@
       <grip:Input step="0" socket="0"/>
       <grip:Input step="0" socket="1">
         <value>
-          <double>63.129496402877706</double>
-          <double>95.15151515151514</double>
+          <double>74.46043165467627</double>
+          <double>90.60606060606058</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="2">
         <value>
-          <double>94.01978417266186</double>
-          <double>173.43434343434345</double>
+          <double>110.07194244604315</double>
+          <double>166.99494949494948</double>
         </value>
       </grip:Input>
       <grip:Input step="0" socket="3">
         <value>
-          <double>110.9892086330935</double>
-          <double>188.45959595959593</double>
+          <double>246.2859712230216</double>
+          <double>255.0</double>
         </value>
       </grip:Input>
       <grip:Output step="0" socket="0" previewed="true"/>
@@ -45,7 +45,7 @@
       <grip:Input step="2" socket="1"/>
       <grip:Input step="2" socket="2"/>
       <grip:Input step="2" socket="3">
-        <value>17.0</value>
+        <value>1.0</value>
       </grip:Input>
       <grip:Input step="2" socket="4">
         <value>BORDER_CONSTANT</value>
@@ -58,12 +58,12 @@
       <grip:Input step="3" socket="1">
         <value>false</value>
       </grip:Input>
-      <grip:Output step="3" socket="0" previewed="false"/>
+      <grip:Output step="3" socket="0" previewed="true"/>
     </grip:Step>
     <grip:Step name="Filter Contours">
       <grip:Input step="4" socket="0"/>
       <grip:Input step="4" socket="1">
-        <value>400.0</value>
+        <value>200.0</value>
       </grip:Input>
       <grip:Input step="4" socket="2">
         <value>75.0</value>
@@ -115,12 +115,12 @@
   </steps>
   <connections>
     <grip:Connection>
-      <grip:Output step="3" socket="0" previewed="false"/>
-      <grip:Input step="4" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
       <grip:Output step="0" socket="0" previewed="true"/>
       <grip:Input step="2" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="4" socket="0" previewed="true"/>
+      <grip:Input step="5" socket="0"/>
     </grip:Connection>
     <grip:Connection>
       <grip:Output step="2" socket="0" previewed="true"/>
@@ -131,8 +131,8 @@
       <grip:Input step="0" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output step="4" socket="0" previewed="true"/>
-      <grip:Input step="5" socket="0"/>
+      <grip:Output step="3" socket="0" previewed="true"/>
+      <grip:Input step="4" socket="0"/>
     </grip:Connection>
     <grip:Connection>
       <grip:Output step="0" socket="0" previewed="true"/>

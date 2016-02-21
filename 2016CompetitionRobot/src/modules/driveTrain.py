@@ -21,13 +21,19 @@ class DriveTrain(object):
         '''
         self.gyro = gyro
         self.max_error = 0.4
-        if leftDrive == leftB:
-            self.robotDrive = wpilib.RobotDrive(leftDrive, rightDrive)
-        else:
-            self.robotDrive = wpilib.RobotDrive(leftDrive, leftB, rightDrive, rightB)
+        
+        self.left = wpilib.CANTalon(leftDrive)
+        self.right = wpilib.CANTalon(rightDrive)
+        self.left.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
+        self.right.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
+        
+        if leftDrive != leftB:
+            self.leftB = wpilib.CANTalon(leftB)
+            self.rightB = wpilib.CANTalon(rightB)
+            self.leftB.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
+            self.rightB.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
+            
         self.setpoint = 0
-        #self.robotDrive.setInvertedMotor(wpilib.RobotDrive.MotorType.kFrontLeft, True)
-        #self.robotDrive.setInvertedMotor(wpilib.RobotDrive.MotorType.kRearRight, True)
         
     def pid_rotate(self, angle):
         print("ROtate to angle {}".format(angle))
@@ -65,7 +71,8 @@ class DriveTrain(object):
         SmartDashboard.putNumber("Total", -(kP + kI + kFF))
         self.arcadeDrive(move, -(kP + kI + kFF))
         
-    def arcadeDrive(self, move, rotate):
+        
+    def arcadeDrive(self, move, rotate, squaredInputs=True, voltage=12):
         if abs(move) > 0.98:
             if move > 0:
                 move = 1

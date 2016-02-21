@@ -24,18 +24,19 @@ from auton_manager import AutonManager
 class MyRobot(wpilib.SampleRobot):
     
     class RobotMap:
-        driveLeftA = 1
-        driveLeftB = 1
-        driveRightA = 2
-        driveRightB = 2
-        shooter = 1
-        armLeft = 7
-        armRight = 8
+        driveLeftA = 4
+        driveLeftB = 5
+        driveRightA = 6
+        driveRightB = 7
+        shooter = 3
+        armLeft = 2
+        armRight = 1
+        
         pulley = 3
-        tape = 0
-        queue = 9
-        innerIntake = 6
-        outerIntake = 5
+        tape = 8
+        queue = 0
+        innerIntake = 2
+        outerIntake = 1
         
         armPot = 0
         rotateGyro = 1
@@ -57,7 +58,7 @@ class MyRobot(wpilib.SampleRobot):
         self.flipper = flipper.Flipper(RobotMap.armLeft, RobotMap.armRight, RobotMap.armPot)
         self.climber = climber.Climber(RobotMap.pulley,RobotMap.tape)
         self.shooter = shooter.Shooter(self.camera,self.driveTrain, RobotMap.shooter)
-        self.newEncoder = wpilib.SPI(1)
+     #   self.newEncoder = wpilib.SPI(1)
         self.robotAccel = wpilib.BuiltInAccelerometer()
         self.wasFlipperSet = False
         self.auto_manager = AutonManager(self.climber, self.driveTrain, self.flipper, self.intake, self.queue, self.shooter, self.camera)
@@ -151,7 +152,7 @@ class MyRobot(wpilib.SampleRobot):
             
             #FLIPPER
             #TODO - Re-insert PID to flipper
-            if(abs(OI.flipper.toDouble()) > 0.25) or True:
+            if(abs(OI.flipper.toDouble()) > 0.25):
                 self.flipper.set(OI.flipper.toDouble() * 0.5)
                 self.wasFlipperSet = True
             else:
@@ -178,17 +179,29 @@ class MyRobot(wpilib.SampleRobot):
             #INTAKE
             if OI.outer_arm_only.toBoolean():
                 self.intake.set(-OI.intake.toDouble(), -1)
+            elif OI.queue.toDouble() != 0:
+                self.intake.set(1,0)
             else:
-                self.intake.set(-OI.intake.toDouble())
-            if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
-                self.queue.set(-0.5)
+                if OI.intake.toDouble() > 0.5:
+                    self.intake.set(-0.5)
+                elif OI.intake.toDouble() < -0.5:
+                    self.intake.set(1)
+                else:
+                    self.intake.set(0)
+                    
+                #self.intake.set(-OI.intake.toDouble())
+            if OI.queue.toDouble() == 0 and abs(OI.intake.toDouble()) > 0.5:
+                self.queue.set(-1)
             else: #time to shot- 4sec
                 self.queue.set(OI.queue.toDouble() * 0.4)  
                 
             self.climber.setPulley(self.deadband(OI.pulley.toDouble()))
             self.climber.setTape(self.deadband(OI.tape.toDouble()))
-            self.shooter.changeOnToggle(OI.shooter.toDouble())
             
+            #SHOOTER
+            #self.shooter.fullPowerToggle(OI.shooter_max_speed.toBoolean())
+            self.shooter.changeOnToggle(OI.shooter.toDouble())
+            #END SHOOTER
             
             '''
             shooterSet = OI.shooter.toDouble()

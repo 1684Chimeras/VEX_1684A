@@ -14,9 +14,9 @@ class Camera(object):
     '''
     classdocs
     '''
-    camera_width = 320
-    camera_height = 240
-    center_x = 152
+    camera_width = 240
+    camera_height = 320
+    center_x = 125
     center_y = 137
     angle_of_camera = 67
     degrees_per_x_error = -angle_of_camera / camera_width

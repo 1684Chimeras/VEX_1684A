@@ -28,15 +28,20 @@ class Shooter(object):
         #analysis - 24000, -9 voltage -8.7 dec voltage hovered at 24850- 
         #analysis - 24000, -9 voltage -8.7 dec voltage hovered at 24300- hit the bottom of the goal at the back lien of the defense
         #analysis - 24000, -91 voltage -8.8 dec voltage hovered at 24800- hit the bottom of the goal at the back lien of the defense
-        self.wheelMaxError = 1000
-        self.testSetpoint = 26650
+        #analysis - 26650 - 9.613 voltage 9.3 dec - fk the real robot
+        self.wheelMaxError = 600
+        self.testSetpoint = 30000
         self.camera = camera
         self.driveTrain = driveTrain
-        
-        self.maxVoltageSetpoint = -13
-        self.voltageSetpoint = -9.7
-        self.decVoltageSetpoint = -9.4
+       #self.maxVoltageSetpoint = 13
+        #self.voltageSetpoint = 13
+        #self.decVoltageSetpoint = 13
+        self.maxVoltageSetpoint = 13
+        self.voltageSetpoint = 9.613 * (self.testSetpoint/ 26300.0)
+        self.decVoltageSetpoint = 9.3 * (self.testSetpoint / 26300.0)
         self.motor = wpilib.CANTalon(params)
+        self.motor.reverseOutput(False)
+        
         self.motor.enableBrakeMode(True)
         self.motor.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
         self.wasBrake = True
@@ -46,11 +51,35 @@ class Shooter(object):
         _thread.start_new_thread( self.periodic, ("Shooter-Update-Thread", "literally nothing",))
         self.pdp = powerdistributionpanel.PowerDistributionPanel()
         
+        self.prevVoltageSetpoint = self.voltageSetpoint
+        self.prevDecSetpoint = self.decVoltageSetpoint
+        
         
         self.motor.reverseOutput(False)
         self.motor.setFeedbackDevice(0) 
+        
+        self.isFullPower = False
+        self.wasFullPowerToggled = False
     
         
+    def fullPowerToggle(self, toggle):
+        if toggle:
+            if not self.wasFullPowerToggled:
+                self.wasFullPowerToggled = True
+                self.isFullPower = not self.isFullPower
+        else:
+            self.wasFullPowerToggled = False
+            
+        self.fullPower(self.isFullPower)
+    def fullPower(self, fullPower=True):
+        if fullPower:
+            self.isFullPower = True
+            self.decVoltageSetpoint = self.maxVoltageSetpoint
+            self.voltageSetpoint = self.maxVoltageSetpoint
+        else:
+            self.isFullPower = False
+            self.decVoltageSetpoint = self.prevDecSetpoint
+            self.voltageSetpoint = self.prevVoltageSetpoint
     def getWheelPosition(self):
         return -self.motor.getEncPosition()
     def getWheelVelocity(self):

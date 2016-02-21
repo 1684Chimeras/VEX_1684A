@@ -16,7 +16,7 @@ class Climber(object):
         Constructor
         '''
         self.pulley = wpilib.VictorSP(pulley)
-        self.tape = wpilib.VictorSP(tape)
+        self.tape = wpilib.CANTalon(tape)
         
     def setPulley(self,value):
         self.pulley.set(value)

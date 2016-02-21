@@ -11,10 +11,10 @@ class Flipper(object):
     classdocs
     '''
     
-    bottom = 0.310
-    top = 0.700
+    bottom = 321
+    top = 3655
     
-    bottom_theta = 188
+    bottom_theta = 180 + 7.7
     top_theta = 90
 
 
@@ -22,11 +22,17 @@ class Flipper(object):
         '''
         Constructor
         '''
-        self.left = wpilib.VictorSP(left)
-        self.right = wpilib.VictorSP(right)
-        self.right.setInverted(True)
-        
-        self.pot = wpilib.AnalogPotentiometer(pot)
+        self.left = wpilib.CANTalon(left)
+        self.right = wpilib.CANTalon(right)
+    
+        self.left.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
+        self.right.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
+    
+        #self.right.reverseOutput(True)
+        self.talonEncoder = self.left
+        self.talonEncoder.setFeedbackDevice(7)
+        #self.right.configEncoderCodesPerRev(4096)
+         
         self.last_pos_1 = self.getArmPosition()
         self.last_pos_2 = self.getArmPosition()
         self.last_pos_3 = self.getArmPosition()
@@ -85,6 +91,15 @@ class Flipper(object):
         if self.setpoint == -1:
             self.setpoint = self.getArmPosition()
             
+        if self.setpoint > 190:
+            print("Set Comp Rate {}".format(0.1))
+            self.left.setVoltageRampRate(1.2)
+            self.right.setVoltageRampRate(1.2)
+        else:
+            print("Set Comp Rate {}".format(500))
+            self.left.setVoltageRampRate(500)
+            self.right.setVoltageRampRate(500)
+            
         kp = self.pid_calc_p(self.setpoint)
         kff = self.pid_calc_ff(self.setpoint)
         kd = self.pid_calc_d(self.setpoint)
@@ -104,15 +119,16 @@ class Flipper(object):
         wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
         wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())
         value = max(-0.55, min(0.4, value))
-        self.left.set(value)
-        self.right.set(value)
+        self.left.set(value * 7)
+        self.right.set(-value * 7)
         wpilib.SmartDashboard.putNumber("Setpoint", value)
         
     def getPotValue(self):
-        return self.pot.get()
+        return self.talonEncoder.getEncPosition()
+        #return self.pot.get()
     
     def getArmPosition(self):
-        pot_value = self.pot.get()
+        pot_value = self.getPotValue()
         top = Flipper.top
         bottom = Flipper.bottom
         

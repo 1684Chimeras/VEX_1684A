@@ -46,6 +46,7 @@ class OI(object):
         #OI.intake = InputOption.buttons(driver, OI.b, OI.x)
         OI.queue = InputOption.buttons(driver, OI.lb, OI.a)
         OI.shooter = InputOption.button(driver, OI.rb)
+        OI.shooter_max_speed = InputOption.button(driver, OI.y)
         OI.pulley = InputOption.axis(operator, OI.ly)
         OI.tape = InputOption.axis(operator, OI.ry)
         OI.flipper = InputOption.triggers(operator)
