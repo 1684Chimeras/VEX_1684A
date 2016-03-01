@@ -28,7 +28,7 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
     def initialize(self):
         #TODO- Quadratic, PID Loop
         print("Set PDI")
-        self.shooter.setPID(1)
+        #self.shooter.setPID(1)
         print("Set pid done")
         return
 

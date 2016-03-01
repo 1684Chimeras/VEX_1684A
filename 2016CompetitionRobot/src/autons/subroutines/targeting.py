@@ -24,7 +24,7 @@ class TargetingRoutine(BaseAutonRoutine):
     
     def initialize(self):
         #TODO- Quadratic, PID Loop
-        self.drive_train.pid_rotate(self.camera.getRotationOffset())
+        self.drive_train.pid_rotate(-5)
 
     def periodic(self):
         self.drive_train.pid_periodic(0)

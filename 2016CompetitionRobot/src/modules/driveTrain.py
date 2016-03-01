@@ -50,8 +50,8 @@ class DriveTrain(object):
         return abs(self.pid_calc_error()) < self.max_error
     def pid_periodic(self,move):
         const_kP = 0.023
-        const_kI = 0.6
-        const_kFF = 0.29
+        const_kI = 0.4
+        const_kFF = 0.13
         error = self.pid_calc_error()
         ##if error < 5:
         #    const_kI = 1.66 - (error / 6)
@@ -69,7 +69,7 @@ class DriveTrain(object):
         SmartDashboard.putNumber("Drive Pid Error", error)
         SmartDashboard.putNumber("Drive Pid Setpoint", self.setpoint)
         SmartDashboard.putNumber("Total", -(kP + kI + kFF))
-        self.arcadeDrive(move, -(kP + kI + kFF), False, 10)
+        self.arcadeDrive(move, -(kP + kI + kFF), False, 8)
         
         
     def arcadeDrive(self, move, rotate, squaredInputs=True, voltage=12):
@@ -92,22 +92,22 @@ class DriveTrain(object):
             else:
                 move = -(move * move)
             if rotate >= 0.0:
-                rotateValue = (rotate * rotate)
+                rotate = (rotate * rotate)
             else:
-                rotateValue = -(rotate * rotate)
+                rotate = -(rotate * rotate)
 
         leftMotorSpeed = 0
         rightMotorSpeed = 0
         
         if move > 0.0:
-            if rotateValue > 0.0:
+            if rotate > 0.0:
                 leftMotorSpeed = move - rotate
                 rightMotorSpeed = max(move, rotate)
             else:
                 leftMotorSpeed = max(move, -rotate)
                 rightMotorSpeed = move + rotate
         else:
-            if rotateValue > 0.0:
+            if rotate > 0.0:
                 leftMotorSpeed = -max(-move, rotate)
                 rightMotorSpeed = move + rotate
             else:
@@ -115,9 +115,9 @@ class DriveTrain(object):
                 rightMotorSpeed = -max(-move, -rotate)
         
         self.left.set(leftMotorSpeed * voltage)
-        self.rightB.set(-rightMotorSpeed * voltage)
+        self.right.set(-rightMotorSpeed * voltage)
         
         try:
-            self.leftb.set(leftMotorSpeed * voltage)
+            self.leftB.set(leftMotorSpeed * voltage)
             self.rightB.set(-rightMotorSpeed * voltage)
         except: pass

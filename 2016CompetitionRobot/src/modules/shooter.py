@@ -29,7 +29,8 @@ class Shooter(object):
         #analysis - 24000, -9 voltage -8.7 dec voltage hovered at 24300- hit the bottom of the goal at the back lien of the defense
         #analysis - 24000, -91 voltage -8.8 dec voltage hovered at 24800- hit the bottom of the goal at the back lien of the defense
         #analysis - 26650 - 9.613 voltage 9.3 dec - fk the real robot
-        self.wheelMaxError = 600
+        #analysis- using 26300 as a base rpm wth 9.613 steady 9.3 dec worked fine for a while but is dead now
+        self.wheelMaxError = 400
         self.testSetpoint = 30000
         self.camera = camera
         self.driveTrain = driveTrain
@@ -37,8 +38,8 @@ class Shooter(object):
         #self.voltageSetpoint = 13
         #self.decVoltageSetpoint = 13
         self.maxVoltageSetpoint = 13
-        self.voltageSetpoint = 9.613 * (self.testSetpoint/ 26300.0)
-        self.decVoltageSetpoint = 9.3 * (self.testSetpoint / 26300.0)
+        self.voltageSetpoint = 9.63 * (self.testSetpoint/ 26300.0)
+        self.decVoltageSetpoint = 9.4 * (self.testSetpoint / 26300.0)
         self.motor = wpilib.CANTalon(params)
         self.motor.reverseOutput(False)
         
@@ -151,15 +152,15 @@ class Shooter(object):
             if abs(self.getShooterSetpoint() - self.getWheelVelocity()) > self.wheelMaxError:
                 oi.OI.driverVibrate(0,0)
                 if self.getWheelVelocity() > self.getShooterSetpoint():
-                    print("DEC VELOCITY")
+                 #   print("DEC VELOCITY")
                     set = self.decVoltageSetpoint
                     self.motor.set(self.decVoltageSetpoint)
                 else:
-                    print("MAX VELOCITY {} {}".format(self.getWheelVelocity(), self.getShooterSetpoint()))
+              #      print("MAX VELOCITY {} {}".format(self.getWheelVelocity(), self.getShooterSetpoint()))
                     set = self.maxVoltageSetpoint
                     self.motor.set(self.maxVoltageSetpoint)
             else:
-                print("STEADY VELOCITY")
+            #    print("STEADY VELOCITY")
                 if self.driveTrain.ready_to_shoot():
                     oi.OI.driverVibrate(0.7,0.7)
                 else:

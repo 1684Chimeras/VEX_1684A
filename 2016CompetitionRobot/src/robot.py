@@ -40,6 +40,11 @@ class MyRobot(wpilib.SampleRobot):
         
         armPot = 0
         rotateGyro = 1
+        
+        light_left = 6
+        light_right = 7
+        hasBallSwitch = 3
+        hasBallSwitch2 = 1
     
     def robotInit(self):
         '''Robot initialization function'''
@@ -47,9 +52,16 @@ class MyRobot(wpilib.SampleRobot):
         #hello from github
         RobotMap = self.RobotMap
         
-        wpilib.DriverStation.reportError(oi.OI.newLine + "Robot Code Initialize", False)
-     
+        wpilib.DriverStation.reportError("Robot Code Initialize"+ oi.OI.newLine, False)
+        set = time.time()
+        import networktables
+        networktables.NetworkTable.getTable("/GRIP/")
+        print(time.time() - set)
         oi.OI.initialize()
+        self.blueLight = wpilib.Solenoid(RobotMap.light_left)
+        self.blueLightB = wpilib.Solenoid(RobotMap.light_right)
+        self.hasBallSwitch = wpilib.AnalogInput(RobotMap.hasBallSwitch)
+        self.hasBallSwitch2 = wpilib.DigitalInput(RobotMap.hasBallSwitch2)
         self.robotGyro = wpilib.AnalogGyro(RobotMap.rotateGyro)
         self.intake = intake.Intake(RobotMap.innerIntake,RobotMap.outerIntake)
         self.camera = camera.Camera()
@@ -61,22 +73,25 @@ class MyRobot(wpilib.SampleRobot):
      #   self.newEncoder = wpilib.SPI(1)
         self.robotAccel = wpilib.BuiltInAccelerometer()
         self.wasFlipperSet = False
+        self.lastPulleyTime = 0
+        self.pulleyState = False
         self.auto_manager = AutonManager(self.climber, self.driveTrain, self.flipper, self.intake, self.queue, self.shooter, self.camera)
         time.auton_start = 0
         
         self.mode = wpilib.SendableChooser()
-        self.mode.addDefault("Do Nothing", 0)
-        self.mode.addObject("Cross And Score", 1)
+        self.mode.addObject("Do Nothing", 0)
+        self.mode.addDefault("Cross And Score", 1)
         self.mode.addObject("Cross", 2)
         self.mode.addObject("Score", 3)
+        self.mode.addObject("Approach", 4)
         self.defense = wpilib.SendableChooser()
-        self.defense.addDefault("Cheval de Frise", 0)
+        self.defense.addObject("Cheval de Frise", 0)
         self.defense.addObject("Drawbridge", 1)
         self.defense.addObject("Guillotine", 2)
         self.defense.addObject("Moat", 3)
         self.defense.addObject("Sally Port", 4)
         self.defense.addObject("Rough Terrain", 5)
-        self.defense.addObject("Bump", 6)
+        self.defense.addDefault("Bump", 6)
         self.defense.addObject("Ramparts", 7)
         self.defensePosition = wpilib.SendableChooser()
         self.defensePosition.addDefault("Leftmost", 1)
@@ -132,7 +147,31 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterWasSet = False
         self.wasFlipperSet = True
         self.wasRotatePID = False
+        self.hasSeizure = False
         while self.isOperatorControl() and self.isEnabled():
+            start = time.time()
+            if(self.hasBallSwitch.getVoltage() < 0.2 or not self.hasBallSwitch2.get()):
+                self.blueLight.set(True)
+                self.blueLightB.set(True)
+            elif abs(OI.pulley.toDouble()) > 0.15:
+                self.hasSeizure = True
+                if time.time() - self.lastPulleyTime > 1.0/6.0:
+                    self.pulleyState = not self.pulleyState
+                    self.blueLight.set(self.pulleyState)
+                    self.blueLightB.set(not self.pulleyState)
+                    self.lastPulleyTime = time.time()
+            elif abs(OI.tape.toDouble()) > 0.15:
+                if time.time() - self.lastPulleyTime > 1.0/3.0:
+                    self.pulleyState = not self.pulleyState
+                    self.blueLight.set(self.pulleyState)
+                    self.blueLightB.set(self.pulleyState)
+                    self.lastPulleyTime = time.time()
+            else:
+                if self.hasSeizure:
+                    self.auto_manager.lightRoutine(self.blueLight, self.blueLightB)
+                else:
+                    self.blueLight.set(False)
+                    self.blueLightB.set(False)
             wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
             self.camera.processImage()
             #DRIVE TRAIN CODE
@@ -166,6 +205,9 @@ class MyRobot(wpilib.SampleRobot):
                 if OI.arm_pid_up.toBoolean():
                     self.flipper.pid_goto(90)
                     
+                if OI.arm_pid_slam.toBoolean():
+                    self.flipper.pid_goto(82)
+                    
                 if OI.arm_pid_hover.toBoolean():
                     self.flipper.pid_goto(178)
                     
@@ -179,11 +221,17 @@ class MyRobot(wpilib.SampleRobot):
             #INTAKE
             if OI.outer_arm_only.toBoolean():
                 self.intake.set(-OI.intake.toDouble(), -1)
+            elif OI.joy0.getPOV() == OI.north:
+                self.intake.set(0.75,0)
+            elif OI.joy0.getPOV() == OI.east:
+                self.intake.set(1,0)
+            elif OI.joy0.getPOV() == OI.west:
+                self.intake.set(0.25,0)
             elif OI.queue.toDouble() != 0:
                 self.intake.set(1,0)
             else:
                 if OI.intake.toDouble() > 0.5:
-                    self.intake.set(-0.5)
+                    self.intake.set(-1)
                 elif OI.intake.toDouble() < -0.5:
                     self.intake.set(1)
                 else:
@@ -191,7 +239,7 @@ class MyRobot(wpilib.SampleRobot):
                     
                 #self.intake.set(-OI.intake.toDouble())
             if OI.queue.toDouble() == 0 and abs(OI.intake.toDouble()) > 0.5:
-                self.queue.set(-1)
+                self.queue.set(-0.78)
             else: #time to shot- 4sec
                 self.queue.set(OI.queue.toDouble() * 0.4)  
                 
@@ -266,8 +314,10 @@ class MyRobot(wpilib.SampleRobot):
 #             shooterSet = 1.0 if self.leftStick.getRawButton(6) else (-1.0 if self.leftStick.getRawButton(5) else  0.0)
 #             self.shooter.set(-shooterSet)
             
-            
-            wpilib.Timer.delay(0.005) # wait for a motor update time
+            if time.time() - start > 0.005:
+                wpilib.Timer.delay(0.001)
+            else:
+                wpilib.Timer.delay(0.005 - (time.time() - start)) # wait for a motor update time
             
 if __name__ == '__main__':
     

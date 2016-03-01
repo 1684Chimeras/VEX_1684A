@@ -11,8 +11,8 @@ class Flipper(object):
     classdocs
     '''
     
-    bottom = 321
-    top = 3655
+    bottom = 41
+    top = 3291
     
     bottom_theta = 180 + 7.7
     top_theta = 90
@@ -45,7 +45,7 @@ class Flipper(object):
     const_ff = 0.22
     const_p = -0.017
     const_i = 0.01
-    const_d = 0.05
+    const_d = 0.02
     
     def pid_calc_ff(self, pos=-1):
         if(pos == -1):
@@ -92,11 +92,11 @@ class Flipper(object):
             self.setpoint = self.getArmPosition()
             
         if self.setpoint > 190:
-            print("Set Comp Rate {}".format(0.1))
+            #print("Set Comp Rate {}".format(0.1))
             self.left.setVoltageRampRate(1.2)
             self.right.setVoltageRampRate(1.2)
         else:
-            print("Set Comp Rate {}".format(500))
+            #print("Set Comp Rate {}".format(500))
             self.left.setVoltageRampRate(500)
             self.right.setVoltageRampRate(500)
             
@@ -115,6 +115,14 @@ class Flipper(object):
             wpilib.SmartDashboard.putBoolean("No Power", True)
             self.set(kp + kff + kd)
 
+    def set_override(self, value):
+        wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
+        wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())
+        #value = max(-0.55, min(0.4, value))
+        self.left.set(value * 7)
+        self.right.set(-value * 7)
+        wpilib.SmartDashboard.putNumber("Setpoint", value)
+        
     def set(self, value):
         wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
         wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())

@@ -57,10 +57,11 @@ class OI(object):
         OI.driver_move = InputOption.axis(driver, OI.ly)
         OI.driver_rotate = InputOption.axis(driver, OI.rx)
         
-        OI.arm_pid_off = InputOption.pov(operator, OI.south)
-        OI.arm_pid_up = InputOption.pov(operator, OI.north)
-        OI.arm_pid_hover = InputOption.pov(operator, OI.east)
-        OI.arm_pid_diag =InputOption.pov(operator, OI.west)
+        OI.arm_pid_off = InputOption.button(operator, OI.a)
+        OI.arm_pid_up = InputOption.button(operator, OI.y)
+        OI.arm_pid_hover = InputOption.button(operator, OI.b)
+        OI.arm_pid_diag =InputOption.button(operator, OI.x)
+        OI.arm_pid_slam =InputOption.pov(operator, OI.east)
         
     
     @staticmethod
