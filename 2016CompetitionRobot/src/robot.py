@@ -18,6 +18,7 @@ from modules import driveTrain, intake, shooter, flipper, climber, camera
 from wpilib.driverstation import DriverStation
 from networktables import NetworkTable
 from auton_manager import AutonManager
+from dashcomm import DashComm
 
 #robot experienc                                                                                                                                                                                                     e -8g crosing the 2012 bump
 
@@ -79,24 +80,27 @@ class MyRobot(wpilib.SampleRobot):
         time.auton_start = 0
         
         self.mode = wpilib.SendableChooser()
-        self.mode.addObject("Do Nothing", 0)
-        self.mode.addDefault("Cross And Score", 1)
-        self.mode.addObject("Cross", 2)
-        self.mode.addObject("Score", 3)
-        self.mode.addObject("Approach", 4)
+        self.mode.addObject("Not Selected", 0)
+        self.mode.addObject("Do Nothing", 1)
+        self.mode.addObject("Cross And Score", 2)
+        self.mode.addDefault("Cross", 3)
+        self.mode.addObject("Score", 4)
+        self.mode.addObject("Approach", 5)
         self.defense = wpilib.SendableChooser()
-        self.defense.addObject("Cheval de Frise", 0)
-        self.defense.addObject("Drawbridge", 1)
-        self.defense.addObject("Guillotine", 2)
-        self.defense.addObject("Moat", 3)
-        self.defense.addObject("Sally Port", 4)
-        self.defense.addObject("Rough Terrain", 5)
-        self.defense.addDefault("Bump", 6)
-        self.defense.addObject("Ramparts", 7)
+        self.defense.addObject("Not Selected", 0)
+        self.defense.addDefault("Cheval de Frise", 1)
+        self.defense.addObject("Drawbridge", 2)
+        self.defense.addObject("Guillotine", 3)
+        self.defense.addObject("Moat", 4)
+        self.defense.addObject("Sally Port", 5)
+        self.defense.addObject("Rough Terrain", 6)
+        self.defense.addObject("Bump", 7)
+        self.defense.addObject("Ramparts", 8)
         self.defensePosition = wpilib.SendableChooser()
-        self.defensePosition.addDefault("Leftmost", 1)
+        self.defensePosition.addObject("Not Selected", 0)
+        self.defensePosition.addObject("Leftmost", 1)
         self.defensePosition.addObject("Left", 2)
-        self.defensePosition.addObject("Middle", 3)
+        self.defensePosition.addDefault("Middle", 3)
         self.defensePosition.addObject("Right", 4)
         self.defensePosition.addObject("Rightmost", 5)
         wpilib.SmartDashboard.putData("Mode", self.mode)
@@ -106,6 +110,10 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
       
+        #DashComm()
+        print("Begin Delay")
+        #wpilib.Timer.delay(1000)
+        
     def disabled(self):
         while self.isDisabled():
             self.camera.processImage()
@@ -133,6 +141,10 @@ class MyRobot(wpilib.SampleRobot):
     def autonomous(self):
         time.auton_start = time.time()
         self.auto_manager.autonomousInit(self.mode.getSelected(), self.defense.getSelected(), self.defensePosition.getSelected())
+        self.intake.set(0)
+        self.shooter.set(0)
+        self.queue.set(0)
+        self.driveTrain.arcadeDrive(0,0)
         while(self.isAutonomous() and self.isEnabled()):
             self.camera.processImage()
             self.auto_manager.autonomousPeriodic()
@@ -148,6 +160,13 @@ class MyRobot(wpilib.SampleRobot):
         self.wasFlipperSet = True
         self.wasRotatePID = False
         self.hasSeizure = False
+        
+        armGoOut = False
+        armPidOn = False
+        armTime = 0
+        armTimeout = 2
+        #arm
+        
         while self.isOperatorControl() and self.isEnabled():
             start = time.time()
             if(self.hasBallSwitch.getVoltage() < 0.2 or not self.hasBallSwitch2.get()):
@@ -192,7 +211,7 @@ class MyRobot(wpilib.SampleRobot):
             #FLIPPER
             #TODO - Re-insert PID to flipper
             if(abs(OI.flipper.toDouble()) > 0.25):
-                self.flipper.set(OI.flipper.toDouble() * 0.5)
+                self.flipper.set(OI.flipper.toDouble() * 0.8)
                 self.wasFlipperSet = True
             else:
                 if self.wasFlipperSet:
@@ -212,7 +231,7 @@ class MyRobot(wpilib.SampleRobot):
                     self.flipper.pid_goto(178)
                     
                 if OI.arm_pid_diag.toBoolean():
-                    self.flipper.pid_goto(135)
+                    self.flipper.pid_goto(127)
                     
                 self.flipper.pid_goto()
                 
@@ -239,12 +258,33 @@ class MyRobot(wpilib.SampleRobot):
                     
                 #self.intake.set(-OI.intake.toDouble())
             if OI.queue.toDouble() == 0 and abs(OI.intake.toDouble()) > 0.5:
-                self.queue.set(-0.78)
+                self.queue.set(-1)
             else: #time to shot- 4sec
                 self.queue.set(OI.queue.toDouble() * 0.4)  
-                
+            
+            if OI.tape.toDouble() > 0.5:
+                if not armPidOn or (armPidOn and not armGoOut):
+                    armGoOut = True
+                    armPidOn = True
+                    armTime = time.time()
+            elif OI.tape.toDouble() < -0.5:
+                if not armPidOn or (armPidOn and armGoOut):
+                    armGoOut = False
+                    armPidOn = True
+                    armTime = time.time()
+                    
+            if armPidOn:
+                if time.time() - armTimeout > armTime:
+                    armPidOn = False
+                else:
+                    if armGoOut:
+                        self.climber.setTape(1)
+                    else:
+                        self.climber.setTape(-1)
+            else:
+                self.climber.setTape(0)
             self.climber.setPulley(self.deadband(OI.pulley.toDouble()))
-            self.climber.setTape(self.deadband(OI.tape.toDouble()))
+            #self.climber.setTape(self.deadband(OI.tape.toDouble()))
             
             #SHOOTER
             #self.shooter.fullPowerToggle(OI.shooter_max_speed.toBoolean())
@@ -320,6 +360,6 @@ class MyRobot(wpilib.SampleRobot):
                 wpilib.Timer.delay(0.005 - (time.time() - start)) # wait for a motor update time
             
 if __name__ == '__main__':
-    
-     #NetworkTable.setIPAddress("localhost")
+     
+      #NetworkTable.setIPAddress("localhost")
      wpilib.run(MyRobot)

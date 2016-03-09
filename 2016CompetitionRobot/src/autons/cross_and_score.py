@@ -5,6 +5,12 @@ import autons._base_auton
 import time
 class CrossAndScore(autons._base_auton.BaseAutonRoutine):
 
+    def __init__(self, score):
+        self.score = score
+        autons._base_auton.BaseAutonRoutine.__init__(self)
+        self.type = 0
+        self.position = 0
+        
     class OuterWorksType:
         cheval_de_frise = 0
         drawbridge = 1
@@ -22,11 +28,6 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         middle = 3
         right = 4
         rightmost = 5
-        
-    def __init__(self):
-        autons._base_auton.BaseAutonRoutine.__init__(self)
-        self.type = 0
-        self.position = 0
         
     def positionToString(self, position):        
         return "undefined"
@@ -52,39 +53,47 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         
     
     def periodic(self):
-        if self.getTimeElapsed() > 1:
+        if self.getTimeElapsed() > 1.4:
             if self.useGenericRun:
                     if self.driveStage.isFinished():
+                        print("Drive Stage DOne: {}".format(self.getTimeElapsed()))
                         if self.timeoutMark == -1:
+                            
                             self.timeoutMark = time.time()
                         if self.timeoutMark + 2 < time.time():
-                            self.targeting.run()
-                            self.autoshoot.run()
+                            print("Score Rotuine Begin")
+                            if self.score:
+                                print("Scoring!")
+                                self.flipper.pid_goto(120)
+                                self.targeting.run()
+                                self.autoshoot.run()
                     else:
+                        print("Driving!")
                         self.driveStage.run()
                     return
-            elif self.type == self.OuterWorksType.cheval_de_frise or True:
+            elif self.type == self.OuterWorksType.cheval_de_frise or self.type == self.OuterWorksType.guillotine:
                     if self.driveStage.isFinished():
                         self.intakeInitialStage.terminate()
                         if self.timeoutMark == -1:
                             self.timeoutMark = time.time()
-                        if self.timeoutMark + 2 < time.time():
-                            self.targeting.run()
-                            self.autoshoot.run()
+                        if self.timeoutMark + 3 < time.time():
+                            if self.score:
+                                self.flipper.pid_goto(120)
+                                self.targeting.run()
+                                self.autoshoot.run()
                     else:
                         self.driveStage.run()
                         self.intakeInitialStage.run()
                     return
-            elif self.useGenericRun:
-                return
             else:
                 return
-        elif self.getTimeElapsed() > 0.5:
-            self.flipper.pid_goto(180)
+        elif self.getTimeElapsed() > 0.9:
+            self.flipper.pid_goto(183)
         else:
-            self.flipper.set_override(1.1)
+            self.flipper.set_override(0.6)
     
     def initialize(self, defense, position):
+        self._reset()
         self.type = defense
         self.position = position
         self.useGenericRun = False
@@ -92,16 +101,23 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         rammingSpeed = 0.9
         rammingSpeedTimeout = 3
         self.timeoutMark = -1
-        bindRight = -0.3
+        bindRight = -0.1
         
         if self.type == self.OuterWorksType.cheval_de_frise:
             self.driveStage = drive.DriveRoutine(0.73, 0.3,  timeout=2.7)
-            self.intakeInitialStage = run_intake.IntakeRoutine(-1)
+            self.intakeInitialStage = run_intake.IntakeRoutine(0,1)
+            self.timeoutMark = -1
+            return
+        elif self.type == self.OuterWorksType.guillotine:
+            self.driveStage = drive.DriveRoutine(0.73, 0.3,  timeout=2.7)
+            self.intakeInitialStage = run_intake.IntakeRoutine(0,-1)
             self.timeoutMark = -1
             return
         elif self.type == self.OuterWorksType.moat:
+            rammingSpeedTimeout = 0.83 #actual value 1.4
             self.useGenericRun = True
-            self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
+            #self.bindRight = -0.2
+            #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
         elif self.type == self.OuterWorksType.bump:
             self.useGenericRun = True
             #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)

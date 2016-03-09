@@ -14,7 +14,7 @@ class Flipper(object):
     bottom = 41
     top = 3291
     
-    bottom_theta = 180 + 7.7
+    bottom_theta = 187.7
     top_theta = 90
 
 
@@ -39,13 +39,6 @@ class Flipper(object):
         self.last_pos_4 = self.getArmPosition()
         self.last_pos_5 = self.getArmPosition()
         self.setpoint = -1
-    
-    #got this constant perfect the first time- definitely means she's sayin yes amirite
-    #positive constant (negative value) - up
-    const_ff = 0.22
-    const_p = -0.017
-    const_i = 0.01
-    const_d = 0.02
     
     def pid_calc_ff(self, pos=-1):
         if(pos == -1):
@@ -85,6 +78,12 @@ class Flipper(object):
     def pid_lock(self):
         self.pid_goto(self.getArmPosition())
             
+    #positive constant (negative value) - up
+    const_ff = 0.24
+    const_p = -0.017
+    const_i = 0.01
+    const_d = 0.02
+    
     def pid_goto(self, setpoint=-1):
         if(setpoint != -1):
             self.setpoint = setpoint
@@ -101,7 +100,7 @@ class Flipper(object):
             self.right.setVoltageRampRate(500)
             
         kp = self.pid_calc_p(self.setpoint)
-        kff = self.pid_calc_ff(self.setpoint)
+        kff = self.pid_calc_ff(self.getArmPosition())
         kd = self.pid_calc_d(self.setpoint)
         
         wpilib.SmartDashboard.putNumber("kP", kp)
@@ -119,6 +118,8 @@ class Flipper(object):
         wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
         wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())
         #value = max(-0.55, min(0.4, value))
+        if(value > 1 and self.getArmPosition() > 180):
+            value = 0
         self.left.set(value * 7)
         self.right.set(-value * 7)
         wpilib.SmartDashboard.putNumber("Setpoint", value)
@@ -126,7 +127,9 @@ class Flipper(object):
     def set(self, value):
         wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
         wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())
-        value = max(-0.55, min(0.4, value))
+        value = max(-0.7, min(0.4, value))
+        if(value > 1 and self.getArmPosition() > 180):
+            value = 0
         self.left.set(value * 7)
         self.right.set(-value * 7)
         wpilib.SmartDashboard.putNumber("Setpoint", value)

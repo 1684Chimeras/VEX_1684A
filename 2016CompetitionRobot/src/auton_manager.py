@@ -15,11 +15,13 @@ class AutonManager(object):
     '''
     
     def loadAutons(self):
-        self.autons = [ do_nothing.DoNothing(),cross_and_score.CrossAndScore(), cross_defense.CrossDefense(), spybot_score.SpybotScore(), approach.Approach()]
+        self.autons = [ do_nothing.DoNothing(),cross_and_score.CrossAndScore(True), cross_and_score.CrossAndScore(False), spybot_score.SpybotScore(), approach.Approach()]
         
     def autonomousInit(self, mode, defense, position):
-        self.selectedAuton = self.autons[mode]
-        self.selectedAuton.initialize(defense,position)
+        time.auton_start = time.time()
+        self.loadAutons()
+        self.selectedAuton = self.autons[mode-1]
+        self.selectedAuton.initialize(defense-1,position)
     
     def autonomousPeriodic(self):
         self.selectedAuton.periodic()

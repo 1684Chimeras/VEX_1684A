@@ -24,7 +24,9 @@ class DriveRoutine(BaseAutonRoutine):
             
     def initalize(self):
         #TODO- Quadratic, PID Loop
+        BaseAutonRoutine._reset(self)
         self.drive_train.arcadeDrive(self.move, self.rotate)
+        
         
         return
 

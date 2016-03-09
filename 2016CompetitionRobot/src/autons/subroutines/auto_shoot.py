@@ -27,8 +27,9 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
             
     def initialize(self):
         #TODO- Quadratic, PID Loop
+        BaseAutonRoutine._reset(self)
         print("Set PDI")
-        #self.shooter.setPID(1)
+        self.shooter.enable()
         print("Set pid done")
         return
 
@@ -41,12 +42,16 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
             if self.targetingRoutine != 0:
                 if self.targetingRoutine.ready():
                     self.queue.set(1)
+                    self.intake.set(-1)
                     self.spunQueue = True
         
-        if time.auton_start + 9 < time.time():
+        if time.auton_start + 8 < time.time():
             spunQueue = True
             self.queue.set(1)
+            self.intake.set(-1)
+            self.flipper.pid_goto(180)
             
             if time.auton_start + 9.5 < time.time():
                 self.spunIntake = True
                 self.intake.set(-1)
+            self.flipper.pid_goto(185)
