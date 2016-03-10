@@ -24,10 +24,39 @@ class DashComm(object):
     curr_defense = 0
     curr_position = 0
 
-    def server_thread_run(self, som,thingy):
-        print("Server Thread RUn")
+    @staticmethod
+    def isFMSAttached():
+        return False
+    
+    @staticmethod
+    def log(str):
+        pass
+    
+    @staticmethod
+    def print(str):
+        if DashComm.isFMSAttached():
+            DashComm.log(str)
+        else:
+            print(str)
+            
+    @staticmethod
+    def getNumber(key,default):
+        if not DashComm.isFMSAttached():
+            return wpilib.SmartDashboard.getNumber(key,default)
+        else:
+            return default
         
-        print("Temp ping")
+    @staticmethod
+    def putNumber(key,default):
+        if not DashComm.isFMSAttached():
+            wpilib.SmartDashboard.putNumber(key,default)
+        else:
+            pass
+        
+    def server_thread_run(self, som,thingy):
+        DashComm.print("Server Thread RUn")
+        
+        DashComm.print("Temp ping")
         import os
         hostname = ""
         while 1:
@@ -38,11 +67,11 @@ class DashComm(object):
                     self.socket.listen(5)
                     self.socket.settimeout(5)
                     while 1:
-                        print("Socket Listen")
+                        DashComm.print("Socket Listen")
                         conn, addr = self.socket.accept()
-                        print("Socket Accepted")
+                        DashComm.print("Socket Accepted")
                         while conn and addr:
-                            print("Socket Valid")
+                            DashComm.print("Socket Valid")
                             t,d,p = 0,0,0
                             self.acc_data_lock.acquire()
                             t = self.curr_type
@@ -77,7 +106,7 @@ class DashComm(object):
         '''
         self.curr_type = 5
         self.curr_defense = 13
-        self.curr_position = 27
+        self.curr_position = 11
         
         
         _thread.start_new_thread( self.server_thread_run, ("Dashboard-Comm-Thread", "literally nothing",))

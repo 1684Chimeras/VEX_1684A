@@ -53,11 +53,11 @@ class MyRobot(wpilib.SampleRobot):
         #hello from github
         RobotMap = self.RobotMap
         
-        wpilib.DriverStation.reportError("Robot Code Initialize"+ oi.OI.newLine, False)
+        DashComm.print("Robot Code Initialize")
         set = time.time()
         import networktables
         networktables.NetworkTable.getTable("/GRIP/")
-        print(time.time() - set)
+        DashComm.print(time.time() - set)
         oi.OI.initialize()
         self.blueLight = wpilib.Solenoid(RobotMap.light_left)
         self.blueLightB = wpilib.Solenoid(RobotMap.light_right)
@@ -111,7 +111,7 @@ class MyRobot(wpilib.SampleRobot):
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
       
         #DashComm()
-        print("Begin Delay")
+        DashComm.print("Begin Delay")
         #wpilib.Timer.delay(1000)
         
     def disabled(self):

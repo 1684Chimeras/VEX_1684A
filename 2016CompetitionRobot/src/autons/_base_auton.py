@@ -25,16 +25,11 @@ class BaseAutonRoutine(object):
         return
     
     
-    def _reset(self):
+    def start(self):
         self.timeStarted = time.time()
         self.initialized = True
         self.terminated = False 
         self.wasFinished = False
-        
-    
-    def _initialize(self):
-        self.timeStarted = time.time()
-        
         self.initialize()
     
     def periodic(self):

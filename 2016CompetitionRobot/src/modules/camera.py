@@ -7,6 +7,7 @@ Created on Jan 23, 2016
 import wpilib
 import subprocess
 import _thread
+from dashcomm import DashComm
 from networktables import NetworkTable
 from networktables import NumberArray
 
@@ -93,7 +94,7 @@ class Camera(object):
         import numpy as np
         import urllib.request
         while 1:
-            print("Starting Process")
+            DashComm.print("Starting Process")
             stream = urllib.request.urlopen('http://10.16.84.130/mjpg/video.mjpg')
             #
             #self.dataValid = False
@@ -108,24 +109,24 @@ class Camera(object):
                     frame = ''
                     i = 1
                     feedBytes = bytes()
-                    print("Grab File")
+                    DashComm.print("Grab File")
                     while i < 100000:
                         i = i + 1
                         feedBytes = feedBytes + stream.read(1024)
                         a = feedBytes.find(b'\xff\xd8')
                         b = feedBytes.find(b'\xff\xd9')
                         if a != -1 and b != -1:
-                            print("GOOD : Icount {} {} {}".format(i,a,b))
-                            print(feedBytes)
+                            DashComm.print("GOOD : Icount {} {} {}".format(i,a,b))
+                            DashComm.print(feedBytes)
                             jpg = feedBytes[a:b+2]
                             feedBytes = feedBytes[b+2:]
                             frame = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
                             break
                     #ret, frame = video_capture.read()
                     ret = 1
-                    print("Frame Created")
+                    DashComm.print("Frame Created")
                     if i < 99990: 
-                        print("Good Frame")
+                        DashComm.print("Good Frame")
                         #process ret
                         hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
                         lower_bound = np.array([70,115,226])
@@ -143,9 +144,9 @@ class Camera(object):
                         
                         if len(contours) < 1:
                             self.dataValid = False
-                            print("No Targets Found")
+                            DashComm.print("No Targets Found")
                         else:
-                            print("Targets Found")
+                            DashComm.print("Targets Found")
                             contourMax = 0
                             contourMaxPerimeter = 0
                             contourX = 0
