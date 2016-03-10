@@ -112,6 +112,8 @@ class MyRobot(wpilib.SampleRobot):
       
         #DashComm()
         DashComm.print("Begin Delay")
+        while 1:
+            
         #wpilib.Timer.delay(1000)
         
     def disabled(self):
@@ -239,15 +241,15 @@ class MyRobot(wpilib.SampleRobot):
             
             #INTAKE
             if OI.outer_arm_only.toBoolean():
-                self.intake.set(-OI.intake.toDouble(), -1)
+                self.intake.set(OI.intake.toDouble(), 1)
             elif OI.joy0.getPOV() == OI.north:
-                self.intake.set(0.75,0)
+                self.intake.set(-0.75,0)
             elif OI.joy0.getPOV() == OI.east:
-                self.intake.set(1,0)
+                self.intake.set(-1,0)
             elif OI.joy0.getPOV() == OI.west:
-                self.intake.set(0.25,0)
+                self.intake.set(-0.25,0)
             elif OI.queue.toDouble() != 0:
-                self.intake.set(1,0)
+                self.intake.set(-1,0)
             else:
                 if OI.intake.toDouble() > 0.5:
                     self.intake.set(-1)

@@ -105,12 +105,12 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         
         if self.type == self.OuterWorksType.cheval_de_frise:
             self.driveStage = drive.DriveRoutine(0.73, 0.3,  timeout=2.7)
-            self.intakeInitialStage = run_intake.IntakeRoutine(0,1)
+            self.intakeInitialStage = run_intake.IntakeRoutine(0,-1)
             self.timeoutMark = -1
             return
         elif self.type == self.OuterWorksType.guillotine:
             self.driveStage = drive.DriveRoutine(0.73, 0.3,  timeout=2.7)
-            self.intakeInitialStage = run_intake.IntakeRoutine(0,-1)
+            self.intakeInitialStage = run_intake.IntakeRoutine(0,1)
             self.timeoutMark = -1
             return
         elif self.type == self.OuterWorksType.moat:
