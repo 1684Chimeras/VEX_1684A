@@ -19,8 +19,11 @@ class AutonManager(object):
         
     def autonomousInit(self, mode, defense, position):
         time.auton_start = time.time()
-        self.loadAutons()
+        #self.loadAutons()
         self.selectedAuton = self.autons[mode-1]
+        if hasattr(self.selectedAuton, "setOuterWorksType"):
+            self.selectedAuton.setOuterWorksType(defense)
+            self.selectedAuton.setOuterWorksPosition(position)
         self.selectedAuton.start(defense-1,position)
     
     def autonomousPeriodic(self):

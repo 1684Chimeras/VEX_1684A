@@ -60,13 +60,16 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             if self.useGenericRun:
                     if not self.driveStage.isFinished():
                         self.driveStage.run()
-                        DashComm.print("Driving!")
+                    elif hasattr(self, "spinStage") and not self.spinStage.isFinished():
+                        self.driveStage.terminate()
+                        self.spinStage.run()
                     elif self.timeoutMark == -1:
+                        self.driveStage.terminate()
+                        if hasattr(self, "spinStage"):
+                            self.spinStage.terminate()
                         self.timeoutMark = time.time()
                     elif self.timeoutMark + 2 < time.time():
-                        DashComm.print("Score Rotuine Begin")
                         if self.score:
-                            DashComm.print("Scoring!")
                             self.flipper.pid_goto(120)
                             self.targeting.run()
                             self.autoshoot.run()
@@ -91,10 +94,8 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         else:
             self.flipper.set_override(0.6)
     
-    def initialize(self, defense, position):
+    def initialize(self):
         self._reset()
-        self.type = defense
-        self.position = position
         self.useGenericRun = False
         self.timeStarted = time.time()
         rammingSpeed = 0.9
@@ -119,16 +120,13 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
         elif self.type == self.OuterWorksType.bump:
             self.useGenericRun = True
-            #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
-        elif self.type == self.OuterWorksType.drawbridge:
-            self.useGenericRun = True
-        elif self.type == self.OuterWorksType.guillotine:
-            self.useGenericRun = True
         elif self.type == self.OuterWorksType.ramparts:
             self.useGenericRun = True
         elif self.type == self.OuterWorksType.rough_terrain:
             self.useGenericRun = True
+            self.rammingSpeed = 0.7
         elif self.type == self.OuterWorksType.sally_port:
+            rammingSpeedTimeout = 0.83 #actual value 1.4
             self.useGenericRun = True
             
         self.targeting = targeting.TargetingRoutine()
