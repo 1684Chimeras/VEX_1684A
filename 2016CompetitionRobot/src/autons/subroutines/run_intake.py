@@ -13,11 +13,6 @@ class IntakeRoutine(BaseAutonRoutine):
 
 
     def __init__(self, speed, speedOut=-123, timeout=-1):
-        '''
-        Constructor
-        '''
-        BaseAutonRoutine.__init__(self)
-        BaseAutonRoutine._reset(self)
         self.speed = speed
         if speedOut == -123:
             self.speedOut = self.speed

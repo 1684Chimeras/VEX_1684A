@@ -3,11 +3,14 @@ import wpilib
 from autons.subroutines import drive, shoot, run_intake, targeting, auto_shoot, spin #@UnresolvedImport
 import autons._base_auton
 import time
+from dashcomm import DashComm
+
 class CrossAndScore(autons._base_auton.BaseAutonRoutine):
 
     def __init__(self, score):
-        self.score = score
         autons._base_auton.BaseAutonRoutine.__init__(self)
+
+        self.score = score        
         self.type = 0
         self.position = 0
         
@@ -55,36 +58,32 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
     def periodic(self):
         if self.getTimeElapsed() > 1.4:
             if self.useGenericRun:
-                    if self.driveStage.isFinished():
-                        print("Drive Stage DOne: {}".format(self.getTimeElapsed()))
-                        if self.timeoutMark == -1:
-                            
-                            self.timeoutMark = time.time()
-                        if self.timeoutMark + 2 < time.time():
-                            print("Score Rotuine Begin")
-                            if self.score:
-                                print("Scoring!")
-                                self.flipper.pid_goto(120)
-                                self.targeting.run()
-                                self.autoshoot.run()
-                    else:
-                        print("Driving!")
+                    if not self.driveStage.isFinished():
                         self.driveStage.run()
-                    return
+                        DashComm.print("Driving!")
+                    elif self.timeoutMark == -1:
+                        self.timeoutMark = time.time()
+                    elif self.timeoutMark + 2 < time.time():
+                        DashComm.print("Score Rotuine Begin")
+                        if self.score:
+                            DashComm.print("Scoring!")
+                            self.flipper.pid_goto(120)
+                            self.targeting.run()
+                            self.autoshoot.run()
             elif self.type == self.OuterWorksType.cheval_de_frise or self.type == self.OuterWorksType.guillotine:
-                    if self.driveStage.isFinished():
-                        self.intakeInitialStage.terminate()
-                        if self.timeoutMark == -1:
-                            self.timeoutMark = time.time()
-                        if self.timeoutMark + 3 < time.time():
-                            if self.score:
-                                self.flipper.pid_goto(120)
-                                self.targeting.run()
-                                self.autoshoot.run()
-                    else:
+                    if not self.driveStage.isFinished():
                         self.driveStage.run()
                         self.intakeInitialStage.run()
-                    return
+                        
+                    elif self.timeoutMark == -1:
+                        self.driveStage.terminate()
+                        self.intakeInitialStage.terminate()
+                        self.timeoutMark = time.time()
+                    elif self.timeoutMark + 3 < time.time():
+                        if self.score:
+                            self.flipper.pid_goto(120)
+                            self.targeting.run()
+                            self.autoshoot.run()
             else:
                 return
         elif self.getTimeElapsed() > 0.9:

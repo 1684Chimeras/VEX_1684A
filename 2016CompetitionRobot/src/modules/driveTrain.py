@@ -35,6 +35,10 @@ class DriveTrain(object):
             
         self.setpoint = 0
         
+    def stop(self):
+        self.arcadeDrive(0,0)
+        
+        #negative - left
     def pid_rotate(self, angle):
         self.setpoint = angle
         self.integral_accum = 0

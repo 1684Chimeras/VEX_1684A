@@ -13,17 +13,13 @@ class SpinRoutine(BaseAutonRoutine):
 
 
     def __init__(self, deg):
-        '''
-        Constructor
-        '''
-        BaseAutonRoutine.__init__(self)
         self.deg = deg
     
     def initialize(self):
-        BaseAutonRoutine._initialize(self)
-        BaseAutonRoutine._reset(self)
-        
         self.drive.pid_rotate(self.deg)
         
     def periodic(self):
         self.drive.pid_periodic()
+        
+    def onFinished(self):
+        self.drive.stop()

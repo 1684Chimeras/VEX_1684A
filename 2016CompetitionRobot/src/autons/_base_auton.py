@@ -26,6 +26,8 @@ class BaseAutonRoutine(object):
     
     
     def start(self):
+        if not hasattr(self, "timeout"):
+            self.timeout = 999
         self.timeStarted = time.time()
         self.initialized = True
         self.terminated = False 

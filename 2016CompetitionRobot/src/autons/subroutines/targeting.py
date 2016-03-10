@@ -12,10 +12,6 @@ class TargetingRoutine(BaseAutonRoutine):
 
 
     def __init__(self, timeout=-1):
-        '''
-        Constructor
-        '''
-        BaseAutonRoutine.__init__(self)
         if timeout != -1:
             self.setTimeout(timeout)
             
@@ -28,3 +24,6 @@ class TargetingRoutine(BaseAutonRoutine):
 
     def periodic(self):
         self.drive_train.pid_periodic(0)
+        
+    def onFinished(self):
+        self.drive_train.stop()

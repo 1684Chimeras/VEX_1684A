@@ -21,7 +21,7 @@ class AutonManager(object):
         time.auton_start = time.time()
         self.loadAutons()
         self.selectedAuton = self.autons[mode-1]
-        self.selectedAuton.initialize(defense-1,position)
+        self.selectedAuton.start(defense-1,position)
     
     def autonomousPeriodic(self):
         self.selectedAuton.periodic()

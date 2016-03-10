@@ -39,9 +39,6 @@ class JumpObstacle(_base_subroutine.Subroutine):
     
         
     def __init__(self, defenseType):
-        '''
-        Constructor
-        '''
         self.type = defenseType
         types = self.OuterWorksType
         if defenseType == self.OuterWorksType.moat or defenseType == self.OuterWorksType.rough_terrain or defenseType == self.OuterWorksType.bump:
