@@ -24,5 +24,5 @@ class Intake(object):
             self.motor.set(value * -1)
             self.motor_out.set(value * -2)
         else:
-            self.motor.set(value)
-            self.motor_out.set(value2)
+            self.motor.set(-value)
+            self.motor_out.set(-value2)

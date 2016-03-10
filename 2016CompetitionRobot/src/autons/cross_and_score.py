@@ -114,7 +114,7 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             self.timeoutMark = -1
             return
         elif self.type == self.OuterWorksType.moat:
-            rammingSpeedTimeout = 0.83 #actual value 1.4
+            rammingSpeedTimeout = 1.4
             self.useGenericRun = True
             #self.bindRight = -0.2
             #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
@@ -125,7 +125,7 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         elif self.type == self.OuterWorksType.rough_terrain:
             self.useGenericRun = True
             self.rammingSpeed = 0.7
-        elif self.type == self.OuterWorksType.sally_port:
+        elif self.type == self.OuterWorksType.sally_port: #sally port is actually just a testing ground for low bar
             rammingSpeedTimeout = 0.83 #actual value 1.4
             self.useGenericRun = True
             
