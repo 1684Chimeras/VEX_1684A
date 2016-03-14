@@ -8,6 +8,7 @@ import wpilib
 import time
 import _thread
 import oi
+
 from wpilib import powerdistributionpanel
 
 class Shooter(object):
@@ -87,16 +88,20 @@ class Shooter(object):
         return abs(self.motor.getEncVelocity())
     
     def enable(self):
+        self.timeWhenWheelStarted = time.time()
         self.speed = 1
         return
+    
     def getShooterSetpoint(self):
         return self.testSetpoint
     def disable(self):
+        self.timeWhenWheelStarted = time.time()
         self.speed = 0
     timeToFire = 2
     def changeOnToggle(self, value):
         if abs(value) > 0.5:
             if not self.toggleState:
+                self.timeWhenWheelStarted = time.time()
                 self.lastToggleTime = time.time()
                 self.speed = 1 - self.speed
             self.toggleState = True
@@ -104,6 +109,7 @@ class Shooter(object):
             self.toggleState = False
     
     def toggle(self):
+        self.timeWhenWheelStarted = time.time()
         self.speed = 1 - self.speed
         
     def setPID(self, value):
@@ -126,6 +132,7 @@ class Shooter(object):
             wpilib.SmartDashboard.putNumber("Shooter Amp Draw", self.pdp.getCurrent(3))
             time.sleep(0.005)
     timeToSpin = 5.33
+    timeWhenWheelStarted = 0
     def set(self, value):
         if(value > 0.1 or value < -0.1):
             if(self.wasBrake):
@@ -154,22 +161,28 @@ class Shooter(object):
                 if self.getWheelVelocity() > self.getShooterSetpoint():
                  #   print("DEC VELOCITY")
                     set = self.decVoltageSetpoint
+                    oi.OI.driverVibrate(0.4,0.4)
                     self.motor.set(self.decVoltageSetpoint)
                 else:
               #      print("MAX VELOCITY {} {}".format(self.getWheelVelocity(), self.getShooterSetpoint()))
                     set = self.maxVoltageSetpoint
+                    if self.timeWhenWheelStarted + 1.25 < time.time():
+                        oi.OI.driverVibrate(0.4,0.4)
+                    else:
+                        oi.OI.driverVibrate(0, 0)
                     self.motor.set(self.maxVoltageSetpoint)
             else:
             #    print("STEADY VELOCITY")
-                if self.driveTrain.ready_to_shoot():
-                    oi.OI.driverVibrate(0.7,0.7)
-                else:
-                    oi.OI.driverVibrate(0,0)
+                #if self.driveTrain.ready_to_shoot():
+                oi.OI.driverVibrate(0.7,0.7)
+                #else:
+                #    oi.OI.driverVibrate(0,0)
                 set = self.voltageSetpoint
                 self.motor.set(self.voltageSetpoint)
                 
             wpilib.SmartDashboard.putNumber("Shooter Actual Setpoint",  self.motor.get())
             wpilib.SmartDashboard.putNumber("Shooter Desired Setpoint",  set)
         else:
-            oi.OI.driverVibrate(0,0)
+            if not oi.OI.ballVibrating:
+                oi.OI.driverVibrate(0,0)
             self.motor.set(value * self.voltageSetpoint)

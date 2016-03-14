@@ -11,10 +11,11 @@ class Flipper(object):
     classdocs
     '''
     
-    bottom = 41
-    top = 3291
+    bottom = 270
+    top = 3430
+    throw = 3780 - 662
     
-    bottom_theta = 187.7
+    bottom_theta = 187.5
     top_theta = 90
 
 
@@ -79,8 +80,9 @@ class Flipper(object):
         self.pid_goto(self.getArmPosition())
             
     #positive constant (negative value) - up
-    const_ff = 0.24
-    const_p = -0.017
+    #previous before drivers meeting - 0.26 ff, -0.017[
+    const_ff = 0.34
+    const_p = -0.021
     const_i = 0.01
     const_d = 0.02
     
@@ -118,24 +120,34 @@ class Flipper(object):
         wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
         wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())
         #value = max(-0.55, min(0.4, value))
-        if(value > 1 and self.getArmPosition() > 180):
+        self.left.setVoltageRampRate(5000)
+        self.right.setVoltageRampRate(5000)
+        if(value > 1 and self.getArmPosition() > 185):
             value = 0
         self.left.set(value * 7)
         self.right.set(-value * 7)
         wpilib.SmartDashboard.putNumber("Setpoint", value)
         
+    def driver_control(self, value):
+        self.set(value + self.pid_calc_ff(self.getArmPosition()))
+        
     def set(self, value):
         wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
         wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())
-        value = max(-0.7, min(0.4, value))
-        if(value > 1 and self.getArmPosition() > 180):
+        self.left.setVoltageRampRate(5000)
+        self.right.setVoltageRampRate(5000)
+        if self.getArmPosition() < 100:
+            value = max(-0.9, min(0.9, value))
+        else:
+            value = max(-0.7, min(0.4, value))
+        if(value > 1 and self.getArmPosition() > 185):
             value = 0
         self.left.set(value * 7)
         self.right.set(-value * 7)
         wpilib.SmartDashboard.putNumber("Setpoint", value)
         
     def getPotValue(self):
-        return self.talonEncoder.getEncPosition()
+        return self.talonEncoder.getPulseWidthPosition()
         #return self.pot.get()
     
     def getArmPosition(self):

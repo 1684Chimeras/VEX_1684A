@@ -52,8 +52,8 @@ class MyRobot(wpilib.SampleRobot):
         # object that handles basic drive operations
         #hello from github
         RobotMap = self.RobotMap
-        
-        DashComm.print("Robot Code Initialize")
+        print("Robot Code Initialize")
+        #DashComm.print("Robot Code Initialize")
         set = time.time()
         import networktables
         networktables.NetworkTable.getTable("/GRIP/")
@@ -88,14 +88,14 @@ class MyRobot(wpilib.SampleRobot):
         self.mode.addObject("Approach", 5)
         self.defense = wpilib.SendableChooser()
         self.defense.addObject("Not Selected", 0)
-        self.defense.addDefault("Cheval de Frise", 1)
+        self.defense.addObject("Cheval de Frise", 1)
         self.defense.addObject("Drawbridge", 2)
         self.defense.addObject("Guillotine", 3)
         self.defense.addObject("Moat", 4)
         self.defense.addObject("Sally Port", 5)
         self.defense.addObject("Rough Terrain", 6)
         self.defense.addObject("Bump", 7)
-        self.defense.addObject("Ramparts", 8)
+        self.defense.addDefault("Ramparts", 8)
         self.defensePosition = wpilib.SendableChooser()
         self.defensePosition.addObject("Not Selected", 0)
         self.defensePosition.addObject("Leftmost", 1)
@@ -110,10 +110,8 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
       
-        #DashComm()
+        self.dc = DashComm()
         DashComm.print("Begin Delay")
-        while 1:
-            
         #wpilib.Timer.delay(1000)
         
     def disabled(self):
@@ -142,7 +140,12 @@ class MyRobot(wpilib.SampleRobot):
         
     def autonomous(self):
         time.auton_start = time.time()
-        self.auto_manager.autonomousInit(self.mode.getSelected(), self.defense.getSelected(), self.defensePosition.getSelected())
+        if not self.dc.validData():
+            print("DashComm Not Valid Data")
+            self.auto_manager.autonomousInit(self.mode.getSelected(), self.defense.getSelected(), self.defensePosition.getSelected())
+        else:
+            print("DashComm Valid")
+            self.auto_manager.autonomousInit(self.dc.getMode(), self.dc.getDefense(), self.dc.getPosition())
         self.intake.set(0)
         self.shooter.set(0)
         self.queue.set(0)
@@ -169,12 +172,18 @@ class MyRobot(wpilib.SampleRobot):
         armTimeout = 2
         #arm
         
+        hadBall = False
+        hadBallTime = 0
         while self.isOperatorControl() and self.isEnabled():
             start = time.time()
             if(self.hasBallSwitch.getVoltage() < 0.2 or not self.hasBallSwitch2.get()):
+                if not hadBall:
+                    hadBall = True
+                    hadBallTime = time.time()
                 self.blueLight.set(True)
                 self.blueLightB.set(True)
             elif abs(OI.pulley.toDouble()) > 0.15:
+                hadBall = False
                 self.hasSeizure = True
                 if time.time() - self.lastPulleyTime > 1.0/6.0:
                     self.pulleyState = not self.pulleyState
@@ -182,17 +191,27 @@ class MyRobot(wpilib.SampleRobot):
                     self.blueLightB.set(not self.pulleyState)
                     self.lastPulleyTime = time.time()
             elif abs(OI.tape.toDouble()) > 0.15:
+                hadBall = False
                 if time.time() - self.lastPulleyTime > 1.0/3.0:
                     self.pulleyState = not self.pulleyState
                     self.blueLight.set(self.pulleyState)
                     self.blueLightB.set(self.pulleyState)
                     self.lastPulleyTime = time.time()
             else:
+                hadBall = False
                 if self.hasSeizure:
                     self.auto_manager.lightRoutine(self.blueLight, self.blueLightB)
                 else:
                     self.blueLight.set(False)
                     self.blueLightB.set(False)
+                    
+            if hadBall and hadBallTime + 1 > time.time():
+                oi.OI.ballVibrating = True
+                oi.OI.driverVibrate(0.7, -0.7)
+            elif oi.OI.ballVibrating:
+                oi.OI.ballVibrating = False
+                oi.OI.driverVibrate(0,0)
+                
             wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
             self.camera.processImage()
             #DRIVE TRAIN CODE
@@ -213,7 +232,7 @@ class MyRobot(wpilib.SampleRobot):
             #FLIPPER
             #TODO - Re-insert PID to flipper
             if(abs(OI.flipper.toDouble()) > 0.25):
-                self.flipper.set(OI.flipper.toDouble() * 0.8)
+                self.flipper.driver_control(OI.flipper.toDouble() * 0.8)
                 self.wasFlipperSet = True
             else:
                 if self.wasFlipperSet:
@@ -230,11 +249,13 @@ class MyRobot(wpilib.SampleRobot):
                     self.flipper.pid_goto(82)
                     
                 if OI.arm_pid_hover.toBoolean():
-                    self.flipper.pid_goto(178)
+                    self.flipper.pid_goto(173)
                     
                 if OI.arm_pid_diag.toBoolean():
                     self.flipper.pid_goto(127)
                     
+                if OI.arm_pid_backward.toBoolean():
+                    self.flipper.pid_goto(165)
                 self.flipper.pid_goto()
                 
             #END FLIPPER CODE

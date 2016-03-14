@@ -12,8 +12,10 @@ class SpinRoutine(BaseAutonRoutine):
     '''
 
 
-    def __init__(self, deg):
+    def __init__(self, deg, timeout = -1):
         self.deg = deg
+        if timeout != -1:
+            self.setTimeout(timeout)
     
     def initialize(self):
         self.drive.pid_rotate(self.deg)

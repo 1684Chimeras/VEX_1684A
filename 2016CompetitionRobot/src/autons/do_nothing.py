@@ -15,5 +15,5 @@ class DoNothing(autons._base_auton.BaseAutonRoutine):
     def periodic(self):
         return
     
-    def initialize(self, defense, position):
+    def initialize(self):
         return

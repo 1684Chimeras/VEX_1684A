@@ -53,9 +53,10 @@ class DriveTrain(object):
     def ready_to_shoot(self):
         return abs(self.pid_calc_error()) < self.max_error
     def pid_periodic(self,move):
-        const_kP = 0.023
-        const_kI = 0.4
-        const_kFF = 0.13
+        #prev 0.023 0.4 0.13
+        const_kP = 0.033
+        const_kI = 0.5
+        const_kFF = 0.17
         error = self.pid_calc_error()
         ##if error < 5:
         #    const_kI = 1.66 - (error / 6)

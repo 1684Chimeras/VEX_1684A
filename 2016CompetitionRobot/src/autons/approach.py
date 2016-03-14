@@ -20,16 +20,20 @@ class Approach(autons._base_auton.BaseAutonRoutine):
         return
         
     def periodic(self):
-        print("Periodic!")
-        if self.getTimeElapsed() < 1:
-            print("1! {}".format(self.getTimeElapsed()))
+        #print("Periodic!")
+        if self.getTimeElapsed() < 0.9:
+            #print("1! {}".format(self.getTimeElapsed()))
+            self.flipper.set_override(0.6)
+        elif self.getTimeElapsed() < 1.4:
+            self.flipper.pid_goto(205)
+        elif self.getTimeElapsed() < 2.4:
             self.driveStage1.periodic()
         else:
-            print("2: {}".format(self.getTimeElapsed()))
+            #print("2: {}".format(self.getTimeElapsed()))
             self.driveStage2.periodic()
         return
     
-    def initialize(self, defense, position):
+    def initialize(self):
         self.timeStarted = time.time()
         return
     

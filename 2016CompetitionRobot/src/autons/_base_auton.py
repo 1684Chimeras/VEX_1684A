@@ -38,7 +38,7 @@ class BaseAutonRoutine(object):
         return
     
     def isFinished(self):
-        if not self.initialized:
+        if not hasattr(self, "initialized") or not self.initialized:
             return False
         
         b =  self.isTimedOut() or self.terminated
@@ -76,7 +76,7 @@ class BaseAutonRoutine(object):
         
     def run(self):
         if not self.isFinished():
-            if not self.initialized:
+            if not hasattr(self, "initialized") or not self.initialized:
+                self.start()
                 self.initialized = True
-                self._initialize()
             self.periodic()

@@ -18,26 +18,30 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
     def __init__(self, targetingRoutine=0, timeout=-1):
         self.targetingRoutine = targetingRoutine
         self.wheelGood = False
+        self.gripWorking = False
         if timeout != -1:
             self.setTimeout(timeout)
             
     def initialize(self):
         #TODO- Quadratic, PID Loop
-        BaseAutonRoutine._reset(self)
         DashComm.print("Set PDI")
         self.shooter.enable()
+        self.gripWorking = False
         DashComm.print("Set pid done")
         return
 
     def periodic(self):
-        if self.shooter.wheelGood() and (self.targetingRoutine == 0 or self.targetingRoutine.ready()):
-            self.queue.set(1)
-            self.intake.set(-1)
-        
-        if time.auton_start + 8 < time.time():
-            self.queue.set(1)
-            self.intake.set(-1)
-            self.flipper.pid_goto(180)
+        if self.camera.gripWorking():
+            self.gripWorking = True
+        if self.gripWorking:
+            if self.shooter.wheelGood() and (self.targetingRoutine == 0 or self.targetingRoutine.ready()):
+                self.queue.set(1)
+                self.intake.set(-1)
             
-            if time.auton_start + 9.5 < time.time():
-                self.flipper.pid_goto(185)
+            if time.auton_start + 9 < time.time():
+                self.queue.set(1)
+                self.intake.set(-1)
+                self.flipper.pid_goto(180)
+                
+                if time.auton_start + 9.5 < time.time():
+                    self.flipper.pid_goto(185)

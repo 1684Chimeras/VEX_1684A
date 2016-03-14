@@ -6,7 +6,7 @@ Created on Jan 19, 2016
 
 from autons.subroutines._base_subroutine import Subroutine
 from autons._base_auton import BaseAutonRoutine
-from autons import cross_and_score, cross_defense, do_nothing, spybot_score, approach
+from autons import cross_and_score, do_nothing, spybot_score, approach
 import time
 
 class AutonManager(object):
@@ -19,12 +19,16 @@ class AutonManager(object):
         
     def autonomousInit(self, mode, defense, position):
         time.auton_start = time.time()
-        #self.loadAutons()
+        self.loadAutons()
+        print("Mode: {}".format(mode-1))
+        print("Mode: %d".format(mode-1))
+        print("Mode: %d".format(mode-1))
+        print("Mode: %d".format(mode-1))
         self.selectedAuton = self.autons[mode-1]
         if hasattr(self.selectedAuton, "setOuterWorksType"):
             self.selectedAuton.setOuterWorksType(defense)
             self.selectedAuton.setOuterWorksPosition(position)
-        self.selectedAuton.start(defense-1,position)
+        self.selectedAuton.start()
     
     def autonomousPeriodic(self):
         self.selectedAuton.periodic()

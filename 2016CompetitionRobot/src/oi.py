@@ -64,6 +64,7 @@ class OI(object):
         OI.arm_pid_hover = InputOption.button(operator, OI.b)
         OI.arm_pid_diag =InputOption.button(operator, OI.x)
         OI.arm_pid_slam =InputOption.pov(operator, OI.east)
+        OI.arm_pid_backward =InputOption.pov(operator, OI.west)
         
     
     @staticmethod
@@ -99,6 +100,7 @@ class OI(object):
         OI.joy1 = wpilib.Joystick(1)
         OI.joy2 = wpilib.Joystick(2)
         OI.joy3 = wpilib.Joystick(3)
+        OI.ballVibrating = False
         OI.mode = -1
         OI.refresh()
         
