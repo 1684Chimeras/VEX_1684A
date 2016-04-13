@@ -22,7 +22,7 @@ class BaseAutonRoutine(object):
         self.wasFinished = False
         
     def initialize(self):
-        return
+        print("Default Initialize Called")
     
     
     def start(self):

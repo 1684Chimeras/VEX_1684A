@@ -25,17 +25,17 @@ from dashcomm import DashComm
 class MyRobot(wpilib.SampleRobot):
     
     class RobotMap:
-        driveLeftA = 4
-        driveLeftB = 5
-        driveRightA = 6
-        driveRightB = 7
-        shooter = 3
-        armLeft = 2
-        armRight = 1
+        driveLeftA = 2
+        driveLeftB = 3
+        driveRightA = 0
+        driveRightB = 1
+        shooter = 4
+        armLeft = 7
+        armRight = 6
         
-        pulley = 3
-        tape = 8
-        queue = 0
+        pulley = 5
+        tape = 0
+        queue = 3
         innerIntake = 2
         outerIntake = 1
         
@@ -109,7 +109,9 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterWasSet = False
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
-      
+        self.auto_mode = 0
+        self.auto_defense = 0
+        self.auto_position = 0
         #self.dc = DashComm()
         DashComm.print("Begin Delay")
         #wpilib.Timer.delay(1000)
@@ -132,8 +134,13 @@ class MyRobot(wpilib.SampleRobot):
         max_position = 5
         
         modes=["Do Nothing", "Cross and Score", "Cross", "Score", "Approach"]
-        defenses = []
-        positions = []
+        defenses = ["Shovel the Fries", "Drawbridge", "Guillotine", "Moat", "Sally Port", "Rough Terrain", "Bump", "Ramparts"]
+        positions = ["Leftmost (low bar)", "Left", "Middle", "Right", "Rightmost"]
+        
+        defaultMode = 3
+        defaultDefense = 4
+        defaultPosition = 3
+        locked = False
         
         while self.isDisabled():
             self.camera.processImage()
@@ -152,66 +159,110 @@ class MyRobot(wpilib.SampleRobot):
             #LB - Position Down
             #Start (2x) - Confirm Selection
             #Select (2x) - Default Auton
-            
-            if j.getRawButton(b.a):
-                if not buttonPressed:
-                    buttonPressed = True
-                    update = True
-                    mode = mode - 1
-                    if mode < 1:
-                        mode = max_mode
-            elif j.getRawButton(b.y):
-                if not buttonPressed:
-                    buttonPressed = True
-                    update = True
-                    mode = mode + 1
-                    if mode > max_mode:
-                        mode = 1
-            elif j.getRawButton(b.x):
-                if not buttonPressed:
-                    buttonPressed = True
-                    update = True
-                    defense = defense - 1
-                    if defense < 1:
-                        defense = max_defense
-            elif j.getRawButton(b.b):
-                if not buttonPressed:
-                    buttonPressed = True
-                    update = True
-                    defense = defense + 1
-                    if defense > max_defense:
-                        defense = 1
-            elif j.getRawButton(b.lb):
-                if not buttonPressed:
-                    buttonPressed = True
-                    update = True
-                    position = position - 1
-                    if position < 1:
-                        position = max_position
-            elif j.getRawButton(b.rb):
-                if not buttonPressed:
-                    buttonPressed = True
-                    update = True
-                    position = position + 1
-                    if position > max_position:
-                        position = 1
-            elif j.getRawButton(b.start):
-                pass
-            elif j.getRawButton(b.select):
-                pass
+            if not locked:
+                if j.getRawButton(b.a):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        mode = mode - 1
+                        if mode < 1:
+                            mode = max_mode
+                elif j.getRawButton(b.y):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        mode = mode + 1
+                        if mode > max_mode:
+                            mode = 1
+                elif j.getRawButton(b.x):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        defense = defense - 1
+                        if defense < 1:
+                            defense = max_defense
+                elif j.getRawButton(b.b):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        defense = defense + 1
+                        if defense > max_defense:
+                            defense = 1
+                elif j.getRawButton(b.lb):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        position = position - 1
+                        if position < 1:
+                            position = max_position
+                elif j.getRawButton(b.rb):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        position = position + 1
+                        if position > max_position:
+                            position = 1
+                elif j.getRawButton(b.start):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        if startClickedOnce:
+                            #select auton
+                            wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                            wpilib.DriverStation.reportError("\nSelection locked!", False)
+                            locked = True
+                        else:
+                            startClickedOnce = True
+                            wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                            wpilib.DriverStation.reportError("\nAre you sure these are correct?", False)
+                            wpilib.DriverStation.reportError("\nPress start again to confirm", False)
+                    pass
+                elif j.getRawButton(b.select):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        if selectClickedOnce:
+                            #select auton
+                            
+                            mode = defaultMode
+                            defense = defaultDefense
+                            position = defaultPosition
+                            wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                            wpilib.DriverStation.reportError("\nDefault auton loaded!", False)
+                            self.auto_mode = mode
+                            self.auto_defense = defense
+                            self.auto_position = position
+                            locked = True 
+                        else:
+                            selectClickedOnce = True
+                            wpilib.DriverStation.reportError("\n\n\n\n\nAre you sure you want to load the default auton? " + modes[mode-1], False)
+                            
+                else:
+                    buttonPressed = False
+                    
+                if update:
+                    update = False
+                    startClickedOnce = False
+                    selectClickedOnce = False
+                    wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                    wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                    wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                    wpilib.DriverStation.reportError("\nPress Start twice to confirm this selection", False)
+                    wpilib.DriverStation.reportError("\n\nor press Select twice to input default auton", False)
             else:
-                buttonPressed = False
-                
-            if update:
-                update = False
-                startClickedOnce = False
-                selectClickedOnce = False
-                wpilib.DriverStation.reportError("\n\n\nSelected Auton: " + modes[mode-1], False)
-                wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
-                wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
-                wpilib.DriverStation.reportError("\nPress Start twice to confirm this selection", False)
-                wpilib.DriverStation.reportError("\n\nor press Select twice to input default auton", False)
-        
+                if j.getRawButton(b.a) or j.getRawButton(b.b) or j.getRawButton(b.x) or j.getRawButton(b.y) or j.getRawButton(b.lb) or j.getRawButton(b.rb) or j.getRawButton(b.select) or j.getRawButton(b.start):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                        wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                        wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                        wpilib.DriverStation.reportError("\nSelections are locked", False) 
+                else:
+                    buttonPressed = False
     def generate(self, stick, a, b=-1):
         if(b == -1):
             return 1.0 if stick.getRawButton(a) else 0
@@ -230,7 +281,9 @@ class MyRobot(wpilib.SampleRobot):
         time.auton_start = time.time()
         #if not self.dc.validData():
         #    print("DashComm Not Valid Data")
-            self.auto_manager.autonomousInit(self.mode.getSelected(), self.defense.getSelected(), self.defensePosition.getSelected())
+        #self.auto_manager.autonomousInit(self.auto_mode, self.auto_defense, self.auto_position)
+        self.auto_manager.autonomousInit(3, 4, 3)
+        print("Auto selections {} {} {}".format(self.auto_defense, self.auto_mode, self.auto_position))
         #else:
         #    print("DashComm Valid")
         #    self.auto_manager.autonomousInit(self.dc.getMode(), self.dc.getDefense(), self.dc.getPosition())
@@ -313,10 +366,13 @@ class MyRobot(wpilib.SampleRobot):
             if OI.drive_low.toBoolean():
                 driveFactor = 0.7
                 
-            if OI.rotate_pid.toBoolean():
+            if OI.rotate_pid.toBoolean() or OI.joy0.getRawButton(OI.y):
                 if not self.wasRotatePID:
                     self.wasRotatePID = True
-                    self.driveTrain.pid_rotate(self.camera.getRotationOffset())
+                    if OI.joy0.getRawButton(OI.y):
+                        self.driveTrain.pid_rotate(0)
+                    else:
+                        self.driveTrain.pid_rotate(self.camera.getRotationOffset())
                 self.driveTrain.pid_periodic(-OI.driver_move.toDouble())
             else:
                 self.wasRotatePID = False
@@ -350,7 +406,7 @@ class MyRobot(wpilib.SampleRobot):
                     self.flipper.pid_goto(173)
                     
                 if OI.arm_pid_diag.toBoolean():
-                    self.flipper.pid_goto(127)
+                    self.flipper.pid_goto(126)
                     
                 if OI.arm_pid_backward.toBoolean():
                     self.flipper.pid_goto(165)

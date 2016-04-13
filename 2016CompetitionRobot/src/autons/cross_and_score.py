@@ -66,18 +66,20 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                     
         elif self.getTimeElapsed() > 1.4:
             self.flipper.pid_goto(self.getPIDSetpoint())
-            
             if self.useGenericRun:
                 if not self.driveStage.isFinished():
+                    #print("Runnig Drive Stage {}".format(self.getTimeElapsed()))
                     self.driveStage.run()
                 elif self.timeoutMark == -1:
+                    #print("end drive  Stage {}".format(self.getTimeElapsed()))
                     self.driveStage.terminate()
                     self.timeoutMark = time.time()
                 elif self.timeoutMark + 2 < time.time():
+                    #print("targeting Drive Stage {}".format(self.getTimeElapsed()))
                     self.targetingEnable = True
                     self.periodic()
                     
-            elif self.type == self.OuterWorksType.guillotine or self.type == self.OuterWorksType.cheval_de_frise::
+            elif self.type == self.OuterWorksType.guillotine or self.type == self.OuterWorksType.cheval_de_frise:
                 
                 #To begin the auton, drive straight, running the designated intake
                 if not self.driveStage.isFinished():
@@ -102,13 +104,14 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                     self.periodic()
                     
             elif self.type == self.OuterWorksType.ramparts:
+                pass
             else:
                 return
         elif self.getTimeElapsed() > 0.9:
-            print("moving ram down")
+            print("Arm Down")
             self.flipper.pid_goto(self.getPIDSetpoint())
         else:
-            print("override falling")
+            print("Arm Slam")
             self.flipper.set_override(0.6)
     
     def initialize(self):

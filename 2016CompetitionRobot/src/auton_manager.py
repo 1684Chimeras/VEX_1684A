@@ -18,20 +18,22 @@ class AutonManager(object):
         self.autons = [ do_nothing.DoNothing(),cross_and_score.CrossAndScore(True), cross_and_score.CrossAndScore(False), spybot_score.SpybotScore(), approach.Approach()]
         
     def autonomousInit(self, mode, defense, position):
-        time.auton_start = time.time()
-        self.loadAutons()
-        print("Mode: {}".format(mode-1))
-        print("Mode: %d".format(mode-1))
-        print("Mode: %d".format(mode-1))
-        print("Mode: %d".format(mode-1))
-        self.selectedAuton = self.autons[mode-1]
-        if hasattr(self.selectedAuton, "setOuterWorksType"):
-            self.selectedAuton.setOuterWorksType(defense)
-            self.selectedAuton.setOuterWorksPosition(position)
-        self.selectedAuton.start()
+        self.mode = mode
+        print("autointi {} {}".format(mode,defense))
+        if mode > 0:
+            print("init")
+            time.auton_start = time.time()
+            self.loadAutons()
+            print("Mode: {}".format(mode-1))
+            self.selectedAuton = self.autons[mode-1]
+            if hasattr(self.selectedAuton, "setOuterWorksType"):
+                self.selectedAuton.setOuterWorksType(defense)
+                self.selectedAuton.setOuterWorksPosition(position)
+            self.selectedAuton.start()
     
     def autonomousPeriodic(self):
-        self.selectedAuton.periodic()
+        if self.mode > 0:
+            self.selectedAuton.periodic()
         
     def lightRoutineCustom(self, left, right, routine=12345):
         if(routine == 12345):

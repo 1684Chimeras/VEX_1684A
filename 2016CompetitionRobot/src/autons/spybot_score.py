@@ -13,6 +13,7 @@ class SpybotScore(autons._base_auton.BaseAutonRoutine):
         return
         
     def periodic(self):
+        print("spybot")
         return
     
     def initialize(self):

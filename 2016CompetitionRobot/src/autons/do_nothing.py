@@ -13,7 +13,9 @@ class DoNothing(autons._base_auton.BaseAutonRoutine):
         return "Does nothing, what do you want with me?"
         
     def periodic(self):
+        print("do nothing")
         return
     
     def initialize(self):
+        print("initialize do nothing")
         return

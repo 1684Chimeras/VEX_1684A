@@ -11,9 +11,9 @@ class Flipper(object):
     classdocs
     '''
     
-    bottom = 270
-    top = 3430
-    throw = 3780 - 662
+    bottom = 480
+    top = 3640
+    throw = 3640 - 480
     
     bottom_theta = 187.5
     top_theta = 90
@@ -23,14 +23,15 @@ class Flipper(object):
         '''
         Constructor
         '''
-        self.left = wpilib.CANTalon(left)
-        self.right = wpilib.CANTalon(right)
+        #switched ports to invert it
+        self.left = wpilib.CANTalon(right)
+        self.right = wpilib.CANTalon(left)
     
         self.left.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
         self.right.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
     
         #self.right.reverseOutput(True)
-        self.talonEncoder = self.left
+        self.talonEncoder = self.right
         self.talonEncoder.setFeedbackDevice(7)
         #self.right.configEncoderCodesPerRev(4096)
          
@@ -82,7 +83,7 @@ class Flipper(object):
     #positive constant (negative value) - up
     #previous before drivers meeting - 0.26 ff, -0.017[
     const_ff = 0.34
-    const_p = -0.021
+    const_p = -0.026
     const_i = 0.01
     const_d = 0.02
     
