@@ -110,7 +110,7 @@ class MyRobot(wpilib.SampleRobot):
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
       
-        self.dc = DashComm()
+        #self.dc = DashComm()
         DashComm.print("Begin Delay")
         #wpilib.Timer.delay(1000)
         
@@ -140,12 +140,12 @@ class MyRobot(wpilib.SampleRobot):
         
     def autonomous(self):
         time.auton_start = time.time()
-        if not self.dc.validData():
-            print("DashComm Not Valid Data")
+        #if not self.dc.validData():
+        #    print("DashComm Not Valid Data")
             self.auto_manager.autonomousInit(self.mode.getSelected(), self.defense.getSelected(), self.defensePosition.getSelected())
-        else:
-            print("DashComm Valid")
-            self.auto_manager.autonomousInit(self.dc.getMode(), self.dc.getDefense(), self.dc.getPosition())
+        #else:
+        #    print("DashComm Valid")
+        #    self.auto_manager.autonomousInit(self.dc.getMode(), self.dc.getDefense(), self.dc.getPosition())
         self.intake.set(0)
         self.shooter.set(0)
         self.queue.set(0)
