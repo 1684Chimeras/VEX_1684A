@@ -104,8 +104,10 @@ class Flipper(object):
         wpilib.SmartDashboard.putNumber("Potentiometer", self.getArmPosition())
         wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.getPotValue())
         value = max(-0.55, min(0.4, value))
-        self.left.set(value)
-        self.right.set(value)
+        #self.left.set(value)
+        #self.right.set(value)
+        self.left.set(0)
+        self.right.set(0)
         wpilib.SmartDashboard.putNumber("Setpoint", value)
         
     def getPotValue(self):

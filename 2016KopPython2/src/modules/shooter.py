@@ -33,7 +33,7 @@ class Shooter(object):
         self.camera = camera
         self.driveTrain = driveTrain
         
-        self.maxVoltageSetpoint = -13
+        self.maxVoltageSetpoint = -9
         self.voltageSetpoint = -9.7
         self.decVoltageSetpoint = -9.4
         self.motor = wpilib.CANTalon(params)

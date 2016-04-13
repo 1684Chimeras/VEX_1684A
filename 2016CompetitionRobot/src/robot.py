@@ -214,6 +214,11 @@ class MyRobot(wpilib.SampleRobot):
                 
             wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
             self.camera.processImage()
+            
+            
+            
+            
+            
             #DRIVE TRAIN CODE
             driveFactor = 1
             
@@ -228,6 +233,11 @@ class MyRobot(wpilib.SampleRobot):
             else:
                 self.wasRotatePID = False
                 self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
+            
+            
+            
+            
+            
             
             #FLIPPER
             #TODO - Re-insert PID to flipper

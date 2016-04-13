@@ -79,6 +79,7 @@ class DashComm(object):
             self.curr_defense = data[2]
         if data[3] != 0:
             self.curr_position = data[3]
+        
     
     def server_thread_run(self, som,thingy):
         DashComm.print("[DashComm] Starting Server Thread")
@@ -102,13 +103,13 @@ class DashComm(object):
                         conn, addr = self.socket.accept()
                         DashComm.print("[DashComm] Found a connection!")
                         while conn and addr:
-                            DashComm.print("[DashComm] The connection is valid!")
+                          #  DashComm.print("[DashComm] The connection is valid!")
                             conn.settimeout(3)
                             conn.send(bytes('c' + chr(self.curr_type) + chr(self.curr_defense) + chr(self.curr_position), 'ASCII'))
                             data = conn.recv(self.BUFFER_SIZE)
-                            DashComm.print("Data Valid: {} {} {} {}".format(data[0], data[1], data[2], data[3]))
+                          #  DashComm.print("Data Valid: {} {} {} {}".format(data[0], data[1], data[2], data[3]))
                             self.processData(data)
-                            self.dataValid = True
+                            self.dataValid = True 
                 except Exception as ex:
                     self.dataValid = False
                     DashComm.print("[DashComm] Goodbye.")
@@ -136,10 +137,11 @@ class DashComm(object):
         '''
         Constructor
         '''
+        print("DashComm Init")
         self.curr_type = 0
         self.curr_defense = 0
         self.curr_position = 0
         self.dataValid = False
         
         
-        #_thread.start_new_thread( self.server_thread_run, ("Dashboard-Comm-Thread", "literally nothing",))
+        _thread.start_new_thread( self.server_thread_run, ("Dashboard-Comm-Thread", "literally nothing",))

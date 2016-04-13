@@ -18,6 +18,8 @@ from modules import driveTrain, intake, shooter, flipper, climber, camera
 from wpilib.driverstation import DriverStation
 from networktables import NetworkTable
 from auton_manager import AutonManager
+import dashcomm
+import hal
 
 #robot experienc                                                                                                                                                                                                     e -8g crosing the 2012 bump
 
@@ -89,8 +91,17 @@ class MyRobot(wpilib.SampleRobot):
         wpilib.SmartDashboard.putData("Defense Position", self.defensePosition)
         self.shooterWasSet = False
         self.shooterSet = 0.0
+        self.dashcomm = dashcomm.DashComm()
+        #wpilib.Timer.delay(100)
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
-        print("Initialization Successfulrc")
+        print("Initialization Successful")
+        self.waitForDashboard()
+    
+    def waitForDashboard(self):
+        
+        while not self.dashcomm.validData() and not oi.OI.joy0.getRawButton(oi.OI.start):
+            wpilib.Timer.delay(0.05)
+
     def disabled(self):
         while self.isDisabled():
             self.camera.processImage()
@@ -178,8 +189,11 @@ class MyRobot(wpilib.SampleRobot):
             #INTAKE
             if OI.outer_arm_only.toBoolean():
                 self.intake.set(-OI.intake.toDouble(), -1)
+            elif OI.queue.toDouble() != 0:
+                self.intake.set(-1.0)
             else:
                 self.intake.set(-OI.intake.toDouble())
+                
             if OI.queue.toDouble() == 0 and OI.intake.toDouble() != 0:
                 self.queue.set(-0.5)
             else: #time to shot- 4sec

@@ -19,7 +19,9 @@ class Climber(object):
         self.tape = wpilib.VictorSP(tape)
         
     def setPulley(self,value):
-        self.pulley.set(value)
+        #self.pulley.set(value)
+        self.pulley.set(0)
         
     def setTape(self, value):
-        self.tape.set(value)
+        self.tape.set(0)
+        #self.tape.set(value)
