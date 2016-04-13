@@ -115,6 +115,26 @@ class MyRobot(wpilib.SampleRobot):
         #wpilib.Timer.delay(1000)
         
     def disabled(self):
+        buttonPressed = False
+        update = False
+        startClickedOnce = False
+        selectClickedOnce = False
+        
+        j = oi.OI.joy0
+        b = oi.OI
+        
+        mode = 1
+        defense = 1
+        position = 1
+        
+        max_mode = 5
+        max_defense = 8
+        max_position = 5
+        
+        modes=["Do Nothing", "Cross and Score", "Cross", "Score", "Approach"]
+        defenses = []
+        positions = []
+        
         while self.isDisabled():
             self.camera.processImage()
             oi.OI.refresh()
@@ -123,6 +143,74 @@ class MyRobot(wpilib.SampleRobot):
             wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
                                             
             wpilib.Timer.delay(0.005)
+            
+            #A - Mode Down
+            #Y - Mode Up
+            #B - Defense Up
+            #X - Defense Down
+            #RB - Position Up
+            #LB - Position Down
+            #Start (2x) - Confirm Selection
+            #Select (2x) - Default Auton
+            
+            if j.getRawButton(b.a):
+                if not buttonPressed:
+                    buttonPressed = True
+                    update = True
+                    mode = mode - 1
+                    if mode < 1:
+                        mode = max_mode
+            elif j.getRawButton(b.y):
+                if not buttonPressed:
+                    buttonPressed = True
+                    update = True
+                    mode = mode + 1
+                    if mode > max_mode:
+                        mode = 1
+            elif j.getRawButton(b.x):
+                if not buttonPressed:
+                    buttonPressed = True
+                    update = True
+                    defense = defense - 1
+                    if defense < 1:
+                        defense = max_defense
+            elif j.getRawButton(b.b):
+                if not buttonPressed:
+                    buttonPressed = True
+                    update = True
+                    defense = defense + 1
+                    if defense > max_defense:
+                        defense = 1
+            elif j.getRawButton(b.lb):
+                if not buttonPressed:
+                    buttonPressed = True
+                    update = True
+                    position = position - 1
+                    if position < 1:
+                        position = max_position
+            elif j.getRawButton(b.rb):
+                if not buttonPressed:
+                    buttonPressed = True
+                    update = True
+                    position = position + 1
+                    if position > max_position:
+                        position = 1
+            elif j.getRawButton(b.start):
+                pass
+            elif j.getRawButton(b.select):
+                pass
+            else:
+                buttonPressed = False
+                
+            if update:
+                update = False
+                startClickedOnce = False
+                selectClickedOnce = False
+                wpilib.DriverStation.reportError("\n\n\nSelected Auton: " + modes[mode-1], False)
+                wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                wpilib.DriverStation.reportError("\nPress Start twice to confirm this selection", False)
+                wpilib.DriverStation.reportError("\n\nor press Select twice to input default auton", False)
         
     def generate(self, stick, a, b=-1):
         if(b == -1):
