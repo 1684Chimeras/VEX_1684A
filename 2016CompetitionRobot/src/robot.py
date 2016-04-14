@@ -58,7 +58,7 @@ class MyRobot(wpilib.SampleRobot):
         # object that handles basic drive operations
         #hello from github
         RobotMap = self.RobotMap
-        print("Robot Code Initialize")
+        wpilib.DriverStation.reportError("\nRobot Code Initialize", False)
         #DashComm.print("Robot Code Initialize")
         set = time.time()
         import networktables
@@ -92,7 +92,7 @@ class MyRobot(wpilib.SampleRobot):
         self.auto_defense = 0
         self.auto_position = 0
         #self.dc = DashComm()
-        DashComm.print("Begin Delay")
+        wpilib.DriverStation.reportError("\nWaiting for auton selection...", False)
         self.waitForAuton()
         #wpilib.Timer.delay(1000)
         
@@ -105,9 +105,13 @@ class MyRobot(wpilib.SampleRobot):
         j = oi.OI.joy0
         b = oi.OI
         
-        mode = 1
-        defense = 1
-        position = 1
+        defaultMode = 3
+        defaultDefense = 4
+        defaultPosition = 3
+        
+        mode = defaultMode
+        defense = defaultDefense
+        position = defaultPosition
         
         max_mode = 5
         max_defense = 8
@@ -117,9 +121,13 @@ class MyRobot(wpilib.SampleRobot):
         defenses = ["Shovel the Fries", "Drawbridge", "Guillotine", "Moat", "Sally Port", "Rough Terrain", "Bump", "Ramparts"]
         positions = ["Leftmost (low bar)", "Left", "Middle", "Right", "Rightmost"]
         
-        defaultMode = 3
-        defaultDefense = 4
-        defaultPosition = 3
+        wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+        wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+        wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+        wpilib.DriverStation.reportError("\nUse A-B-X-Y-LB-RB to change these", False)
+        wpilib.DriverStation.reportError("\nPress start twice to lock in & enable code", False)
+        wpilib.DriverStation.reportError("\nPress select twice to use default code", False)
+        
         locked = False
         while(not locked): #todo- some FMS check
             self.camera.processImage()
@@ -221,7 +229,7 @@ class MyRobot(wpilib.SampleRobot):
                             locked = True 
                         else:
                             selectClickedOnce = True
-                            wpilib.DriverStation.reportError("\n\n\n\n\nAre you sure you want to load the default auton? " + modes[mode-1], False)
+                            wpilib.DriverStation.reportError("\n\n\n\n\n\n\nAre you sure you want to load the default auton? " + modes[mode-1], False)
                             
                 else:
                     buttonPressed = False
@@ -671,4 +679,4 @@ class MyRobot(wpilib.SampleRobot):
 if __name__ == '__main__':
      
       #NetworkTable.setIPAddress("localhost")
-     wpilib.run(MyRobot)
+    wpilib.run(MyRobot)
