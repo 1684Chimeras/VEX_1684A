@@ -129,7 +129,7 @@ class MyRobot(wpilib.SampleRobot):
         wpilib.DriverStation.reportError("\nPress select twice to use default code", False)
         
         locked = False
-        while(not locked and not wpilib.DriverStation.getInstance().isEnabled() and not self.isSimulation()): #todo- some FMS check
+        while(not locked and not wpilib.DriverStation.getInstance().isEnabled() and not self.isSimulation() and not self.isOperatorControl() and not self.isAutonomous()): #todo- some FMS check
             self.camera.processImage()
             oi.OI.refresh()
             wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
@@ -512,7 +512,7 @@ class MyRobot(wpilib.SampleRobot):
                 self.driveTrain.pid_periodic(-OI.driver_move.toDouble())
             else:
                 self.wasRotatePID = False
-                self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor)
+                self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor, squaredInputs = False)
             
             
             
