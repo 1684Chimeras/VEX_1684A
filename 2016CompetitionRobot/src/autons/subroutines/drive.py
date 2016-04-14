@@ -22,22 +22,22 @@ class DriveRoutine(BaseAutonRoutine):
     def initialize(self):
         #TODO- Quadratic, PID Loop
         #BaseAutonRoutine._reset(self)
-        print("init")
+        #print("init")
         if self.keepTrue:
-            print("Initialize Rotate")
+            #print("Initialize Rotate")
             self.drive_train.pid_rotate(0)
         else:
-            print("Initialize Periodic")
+            #print("Initialize Periodic")
             self.drive_train.arcadeDrive(self.move, self.rotate)
         
 
     def periodic(self):
-        print("Periodic")
+        #print("Periodic")
         if self.keepTrue:
-            print("Periodic kt")
+            #print("Periodic kt")
             self.drive_train.pid_periodic(self.move)
         else:
-            print("Periodic b")
+            #print("Periodic b")
             self.drive_train.arcadeDrive(self.move, self.rotate)
     
     def onFinished(self):

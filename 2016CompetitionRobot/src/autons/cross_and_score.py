@@ -108,10 +108,10 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             else:
                 return
         elif self.getTimeElapsed() > 0.9:
-            print("Arm Down")
+            #print("Arm Down")
             self.flipper.pid_goto(self.getPIDSetpoint())
         else:
-            print("Arm Slam")
+            #print("Arm Slam")
             self.flipper.set_override(0.6)
     
     def initialize(self):

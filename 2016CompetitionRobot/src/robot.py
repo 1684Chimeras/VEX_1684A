@@ -129,7 +129,7 @@ class MyRobot(wpilib.SampleRobot):
         wpilib.DriverStation.reportError("\nPress select twice to use default code", False)
         
         locked = False
-        while(not locked): #todo- some FMS check
+        while(not locked and not wpilib.DriverStation.getInstance().isEnabled() and not self.isSimulation()): #todo- some FMS check
             self.camera.processImage()
             oi.OI.refresh()
             wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
