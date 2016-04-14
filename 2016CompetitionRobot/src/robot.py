@@ -19,6 +19,7 @@ from wpilib.driverstation import DriverStation
 from networktables import NetworkTable
 from auton_manager import AutonManager
 from dashcomm import DashComm
+#from wpilib.cameraserver import CameraServer
 
 #robot experienc                                                                                                                                                                                                     e -8g crosing the 2012 bump
 
@@ -42,12 +43,17 @@ class MyRobot(wpilib.SampleRobot):
         armPot = 0
         rotateGyro = 1
         
-        light_left = 6
-        light_right = 7
+        light_left = 0
+        light_right = 1
         hasBallSwitch = 3
         hasBallSwitch2 = 1
     
     def robotInit(self):
+        #Driver Camera
+        #import wpilib.CameraServer
+        #CameraServer.startAutomaticCapture(CameraServer.getInstance(), "cam0")
+        
+        
         '''Robot initialization function'''
         # object that handles basic drive operations
         #hello from github
@@ -211,6 +217,9 @@ class MyRobot(wpilib.SampleRobot):
                             wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
                             wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
                             wpilib.DriverStation.reportError("\nSelection locked!", False)
+                            self.auto_mode = mode
+                            self.auto_defense = defense
+                            self.auto_position = position
                             locked = True
                         else:
                             startClickedOnce = True
@@ -254,6 +263,7 @@ class MyRobot(wpilib.SampleRobot):
                     wpilib.DriverStation.reportError("\nPress Start twice to confirm this selection", False)
                     wpilib.DriverStation.reportError("\n\nor press Select twice to input default auton", False)
             else:
+                #wpilib.DriverStation.reportError("peri",False)
                 if j.getRawButton(b.a) or j.getRawButton(b.b) or j.getRawButton(b.x) or j.getRawButton(b.y) or j.getRawButton(b.lb) or j.getRawButton(b.rb) or j.getRawButton(b.select) or j.getRawButton(b.start):
                     if not buttonPressed:
                         buttonPressed = True
@@ -282,6 +292,14 @@ class MyRobot(wpilib.SampleRobot):
         #if not self.dc.validData():
         #    print("DashComm Not Valid Data")
         #self.auto_manager.autonomousInit(self.auto_mode, self.auto_defense, self.auto_position)
+        
+        modes=["Do Nothing", "Cross and Score", "Cross", "Score", "Approach"]
+        defenses = ["Shovel the Fries", "Drawbridge", "Guillotine", "Moat", "Sally Port", "Rough Terrain", "Bump", "Ramparts"]
+        positions = ["Leftmost (low bar)", "Left", "Middle", "Right", "Rightmost"]
+        
+        wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[self.auto_mode-1], False)
+        wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[self.auto_defense-1], False)
+        wpilib.DriverStation.reportError("\nSelected Position: " + positions[self.auto_position-1], False)
         self.auto_manager.autonomousInit(3, 4, 3)
         print("Auto selections {} {} {}".format(self.auto_defense, self.auto_mode, self.auto_position))
         #else:
@@ -313,6 +331,7 @@ class MyRobot(wpilib.SampleRobot):
         armTimeout = 2
         #arm
         
+                            
         hadBall = False
         hadBallTime = 0
         while self.isOperatorControl() and self.isEnabled():
@@ -410,6 +429,10 @@ class MyRobot(wpilib.SampleRobot):
                     
                 if OI.arm_pid_backward.toBoolean():
                     self.flipper.pid_goto(165)
+                    
+                if abs(OI.pulley.toDouble()) > 0.4:
+                    self.flipper.pid_goto(205)
+                    
                 self.flipper.pid_goto()
                 
             #END FLIPPER CODE
