@@ -133,7 +133,7 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             self.timeoutMark = -1
             return
         elif self.type == self.OuterWorksType.moat:
-            rammingSpeedTimeout = 1.4
+            rammingSpeedTimeout = 3
             self.useGenericRun = True
             #self.bindRight = -0.2
             #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
@@ -141,7 +141,7 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             #rammingSpeed = -0.9
             self.useGenericRun = True
         elif self.type == self.OuterWorksType.ramparts:
-            self.driveStage = drive.DriveRoutine(0.8, 0.3,  timeout=2.7, keepTrue=True)
+            self.driveStage = drive.DriveRoutine(0.8, 0.3,  timeout=4, keepTrue=True)
             self.useGenericRun = True
         elif self.type == self.OuterWorksType.rough_terrain:
             self.useGenericRun = True
