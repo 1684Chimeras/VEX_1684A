@@ -120,9 +120,10 @@ class MyRobot(wpilib.SampleRobot):
         self.auto_position = 0
         #self.dc = DashComm()
         DashComm.print("Begin Delay")
+        self.waitForAuton()
         #wpilib.Timer.delay(1000)
         
-    def disabled(self):
+    def waitForAuton(self):
         buttonPressed = False
         update = False
         startClickedOnce = False
@@ -147,8 +148,7 @@ class MyRobot(wpilib.SampleRobot):
         defaultDefense = 4
         defaultPosition = 3
         locked = False
-        
-        while self.isDisabled():
+        while(not locked): #todo- some FMS check
             self.camera.processImage()
             oi.OI.refresh()
             wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
@@ -262,17 +262,53 @@ class MyRobot(wpilib.SampleRobot):
                     wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
                     wpilib.DriverStation.reportError("\nPress Start twice to confirm this selection", False)
                     wpilib.DriverStation.reportError("\n\nor press Select twice to input default auton", False)
+                    
+    def disabled(self):
+        buttonPressed = False
+        update = False
+        startClickedOnce = False
+        selectClickedOnce = False
+        
+        j = oi.OI.joy0
+        b = oi.OI
+        
+        mode = 1
+        defense = 1
+        position = 1
+        
+        max_mode = 5
+        max_defense = 8
+        max_position = 5
+        
+        modes=["Do Nothing", "Cross and Score", "Cross", "Score", "Approach"]
+        defenses = ["Shovel the Fries", "Drawbridge", "Guillotine", "Moat", "Sally Port", "Rough Terrain", "Bump", "Ramparts"]
+        positions = ["Leftmost (low bar)", "Left", "Middle", "Right", "Rightmost"]
+        
+        defaultMode = 3
+        defaultDefense = 4
+        defaultPosition = 3
+        locked = False
+        
+        while self.isDisabled():
+            
+            self.camera.processImage()
+            oi.OI.refresh()
+            wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
+            wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.flipper.getPotValue())
+            wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
+                                            
+            wpilib.Timer.delay(0.005)
+            
+            #wpilib.DriverStation.reportError("peri",False)
+            if j.getRawButton(b.a) or j.getRawButton(b.b) or j.getRawButton(b.x) or j.getRawButton(b.y) or j.getRawButton(b.lb) or j.getRawButton(b.rb) or j.getRawButton(b.select) or j.getRawButton(b.start):
+                if not buttonPressed:
+                    buttonPressed = True
+                    wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                    wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                    wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                    wpilib.DriverStation.reportError("\nSelections are locked", False) 
             else:
-                #wpilib.DriverStation.reportError("peri",False)
-                if j.getRawButton(b.a) or j.getRawButton(b.b) or j.getRawButton(b.x) or j.getRawButton(b.y) or j.getRawButton(b.lb) or j.getRawButton(b.rb) or j.getRawButton(b.select) or j.getRawButton(b.start):
-                    if not buttonPressed:
-                        buttonPressed = True
-                        wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
-                        wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
-                        wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
-                        wpilib.DriverStation.reportError("\nSelections are locked", False) 
-                else:
-                    buttonPressed = False
+                buttonPressed = False
     def generate(self, stick, a, b=-1):
         if(b == -1):
             return 1.0 if stick.getRawButton(a) else 0
