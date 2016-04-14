@@ -84,34 +84,7 @@ class MyRobot(wpilib.SampleRobot):
         self.pulleyState = False
         self.auto_manager = AutonManager(self.climber, self.driveTrain, self.flipper, self.intake, self.queue, self.shooter, self.camera)
         time.auton_start = 0
-        
-        self.mode = wpilib.SendableChooser()
-        self.mode.addObject("Not Selected", 0)
-        self.mode.addObject("Do Nothing", 1)
-        self.mode.addObject("Cross And Score", 2)
-        self.mode.addDefault("Cross", 3)
-        self.mode.addObject("Score", 4)
-        self.mode.addObject("Approach", 5)
-        self.defense = wpilib.SendableChooser()
-        self.defense.addObject("Not Selected", 0)
-        self.defense.addObject("Cheval de Frise", 1)
-        self.defense.addObject("Drawbridge", 2)
-        self.defense.addObject("Guillotine", 3)
-        self.defense.addObject("Moat", 4)
-        self.defense.addObject("Sally Port", 5)
-        self.defense.addObject("Rough Terrain", 6)
-        self.defense.addObject("Bump", 7)
-        self.defense.addDefault("Ramparts", 8)
-        self.defensePosition = wpilib.SendableChooser()
-        self.defensePosition.addObject("Not Selected", 0)
-        self.defensePosition.addObject("Leftmost", 1)
-        self.defensePosition.addObject("Left", 2)
-        self.defensePosition.addDefault("Middle", 3)
-        self.defensePosition.addObject("Right", 4)
-        self.defensePosition.addObject("Rightmost", 5)
-        wpilib.SmartDashboard.putData("Mode", self.mode)
-        wpilib.SmartDashboard.putData("Defense", self.defense)
-        wpilib.SmartDashboard.putData("Defense Position", self.defensePosition)
+        self.wasTelopRan = False
         self.shooterWasSet = False
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
@@ -272,9 +245,9 @@ class MyRobot(wpilib.SampleRobot):
         j = oi.OI.joy0
         b = oi.OI
         
-        mode = 1
-        defense = 1
-        position = 1
+        mode = self.auto_mode
+        defense = self.auto_defense
+        position = self.auto_position
         
         max_mode = 5
         max_defense = 8
@@ -299,8 +272,106 @@ class MyRobot(wpilib.SampleRobot):
                                             
             wpilib.Timer.delay(0.005)
             
+            if self.wasTelopRan and not locked:
+            
+                if j.getRawButton(b.a):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        mode = mode - 1
+                        if mode < 1:
+                            mode = max_mode
+                elif j.getRawButton(b.y):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        mode = mode + 1
+                        if mode > max_mode:
+                            mode = 1
+                elif j.getRawButton(b.x):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        defense = defense - 1
+                        if defense < 1:
+                            defense = max_defense
+                elif j.getRawButton(b.b):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        defense = defense + 1
+                        if defense > max_defense:
+                            defense = 1
+                elif j.getRawButton(b.lb):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        position = position - 1
+                        if position < 1:
+                            position = max_position
+                elif j.getRawButton(b.rb):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        update = True
+                        position = position + 1
+                        if position > max_position:
+                            position = 1
+                elif j.getRawButton(b.start):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        if startClickedOnce:
+                            #select auton
+                            wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                            wpilib.DriverStation.reportError("\nSelection locked!", False)
+                            self.auto_mode = mode
+                            self.auto_defense = defense
+                            self.auto_position = position
+                            locked = True
+                        else:
+                            startClickedOnce = True
+                            wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                            wpilib.DriverStation.reportError("\nAre you sure these are correct?", False)
+                            wpilib.DriverStation.reportError("\nPress start again to confirm", False)
+                    pass
+                elif j.getRawButton(b.select):
+                    if not buttonPressed:
+                        buttonPressed = True
+                        if selectClickedOnce:
+                            #select auton
+                            
+                            mode = defaultMode
+                            defense = defaultDefense
+                            position = defaultPosition
+                            wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                            wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                            wpilib.DriverStation.reportError("\nDefault auton loaded!", False)
+                            self.auto_mode = mode
+                            self.auto_defense = defense
+                            self.auto_position = position
+                            locked = True 
+                        else:
+                            selectClickedOnce = True
+                            wpilib.DriverStation.reportError("\n\n\n\n\nAre you sure you want to load the default auton? " + modes[mode-1], False)
+                            
+                else:
+                    buttonPressed = False
+                    
+                if update:
+                    update = False
+                    startClickedOnce = False
+                    selectClickedOnce = False
+                    wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
+                    wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
+                    wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
+                    wpilib.DriverStation.reportError("\nPress Start twice to confirm this selection", False)
+                    wpilib.DriverStation.reportError("\n\nor press Select twice to input default auton", False)
             #wpilib.DriverStation.reportError("peri",False)
-            if j.getRawButton(b.a) or j.getRawButton(b.b) or j.getRawButton(b.x) or j.getRawButton(b.y) or j.getRawButton(b.lb) or j.getRawButton(b.rb) or j.getRawButton(b.select) or j.getRawButton(b.start):
+            elif j.getRawButton(b.a) or j.getRawButton(b.b) or j.getRawButton(b.x) or j.getRawButton(b.y) or j.getRawButton(b.lb) or j.getRawButton(b.rb) or j.getRawButton(b.select) or j.getRawButton(b.start):
                 if not buttonPressed:
                     buttonPressed = True
                     wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
@@ -309,6 +380,7 @@ class MyRobot(wpilib.SampleRobot):
                     wpilib.DriverStation.reportError("\nSelections are locked", False) 
             else:
                 buttonPressed = False
+                
     def generate(self, stick, a, b=-1):
         if(b == -1):
             return 1.0 if stick.getRawButton(a) else 0
@@ -366,6 +438,7 @@ class MyRobot(wpilib.SampleRobot):
         armTime = 0
         armTimeout = 2
         #arm
+        self.wasTelopRan = True
         
                             
         hadBall = False
