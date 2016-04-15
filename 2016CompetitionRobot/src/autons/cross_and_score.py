@@ -40,10 +40,20 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         self.type = type
 
     def getPIDSetpoint(self):
+        print("type {}".format(self.type))
         if self.type == self.OuterWorksType.cheval_de_frise:
-            return 180
+            return 160
+        
         elif self.type == self.OuterWorksType.guillotine:
             return 170
+        
+        elif self.type == self.OuterWorksType.ramparts:
+            if self.getTimeElapsed() > 3:
+                print("Arm DOwn")
+                return 205
+            else:
+                print("Arm Up")
+                return 173
         else:
             return 205
     
@@ -85,10 +95,35 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                 if not self.driveStage.isFinished():
                     
                     #For the cheval auton, you'll want to put the arm down after 1.2 seconds to put the fries down
-                    if self.getTimeElapsed() > 1.4 + 1.2 and self.type == self.OuterWorksType.cheval_de_frise:
-                        self.flipper.set_override(0.6)
-                        
-                    self.driveStage.run()
+                    if self.type == self.OuterWorksType.cheval_de_frise:
+                        print("type=chvl")
+                        if self.getTimeElapsed() < 1.4 + 1.5:
+                            print("approach {}".format(self.getTimeElapsed()))
+                            self.driveStageZero.run()
+                        elif self.getTimeElapsed() < 1.4 + 2.0:
+                            print("stop")
+                            self.drive_train.arcadeDrive(-0.2,0)
+                            self.driveStageZero.terminate()
+                        elif self.getTimeElapsed() < 1.4 + 2.5:
+                            print("arm down go")
+                            print("put arm down")
+                            self.flipper.set_override(0.6)
+                            self.drive_train.arcadeDrive(0,0)
+                        else:
+                            self.flipper.set_override(0.6)
+                            self.driveStage.run()
+                            print("approach")
+                    else:
+                        print("not cheval")
+                        if self.getTimeElapsed() > 7.5:
+                            self.drive_train.arcadeDrive(0,0)
+                            self.flipper.set_override(0)
+                        if self.getTimeElapsed() > 6:
+                            self.flipper.set_override(0.3)
+                            self.drive_train.arcadeDrive(0.8,0)
+                        else:
+                            self.driveStage.run()
+                    #self.driveStage.run()
                     self.intakeInitialStage.run()
                     
                 #Wait for the drive to settle down and the camera to get valid data
@@ -124,11 +159,12 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         bindRight = -0.1
         
         if self.type == self.OuterWorksType.cheval_de_frise:
-            self.driveStage = drive.DriveRoutine(0.8, 0.3,  timeout=2.7)
+            self.driveStageZero = drive.DriveRoutine(0.65, 0.1,  timeout=4)
+            self.driveStage = drive.DriveRoutine(0.8, 0.1,  timeout=1.2)
             self.intakeInitialStage = run_intake.IntakeRoutine(0,-1)
             self.timeoutMark = -1
         elif self.type == self.OuterWorksType.guillotine:
-            self.driveStage = drive.DriveRoutine(0.7, 0.1,  timeout=3.4)
+            self.driveStage = drive.DriveRoutine(0.5, 0.1,  timeout=13)
             self.intakeInitialStage = run_intake.IntakeRoutine(0,1)
             self.timeoutMark = -1
             return
@@ -139,9 +175,13 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
         elif self.type == self.OuterWorksType.bump:
             #rammingSpeed = -0.9
-            self.useGenericRun = True
+            rammingSpeed = 0.8
+            rammingSpeedTimeout = 4
+            self.driveStageZero = drive.DriveRoutine(0.8, 0.1, timeout=4)
+            self.driveStageOne = drive.DriveRoutine(0.8, 0.1, timeout=4)
+            self.useGenericRun = False
         elif self.type == self.OuterWorksType.ramparts:
-            self.driveStage = drive.DriveRoutine(0.8, 0.3,  timeout=4, keepTrue=True)
+            self.driveStage = drive.DriveRoutine(0.9, 0,  timeout=4.8 , keepTrue=True)
             self.useGenericRun = True
         elif self.type == self.OuterWorksType.rough_terrain:
             self.useGenericRun = True
@@ -158,10 +198,13 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         indent = 0
         if self.type == self.OuterWorksType.bump:
             indent = 180
+            
         if self.position == self.OuterWorksPosition.left:
-            self.spinStage = spin.SpinRoutine(40 + indent, timeout=1)
+            self.spinStage = spin.SpinRoutine(40 + indent, timeout=1.5, resetGyro=False)
         elif self.position == self.OuterWorksPosition.rightmost:
-            self.spinStage = spin.SpinRoutine(-40 + indent, timeout=1)
+            self.spinStage = spin.SpinRoutine(-40 + indent, timeout=1.5, resetGyro=False)
+        else:
+            self.spinStage = spin.SpinRoutine(0, timeout=1.5, resetGyro=False)
             
         self.targeting = targeting.TargetingRoutine()
         self.autoshoot = auto_shoot.AutomaticShootingRoutine(self.targeting)

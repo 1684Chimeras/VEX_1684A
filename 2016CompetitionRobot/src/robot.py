@@ -84,16 +84,18 @@ class MyRobot(wpilib.SampleRobot):
         self.pulleyState = False
         self.auto_manager = AutonManager(self.climber, self.driveTrain, self.flipper, self.intake, self.queue, self.shooter, self.camera)
         time.auton_start = 0
-        self.wasTelopRan = False
+        self.wasTelopRan = True
         self.shooterWasSet = False
         self.shooterSet = 0.0
       #  self.leftStick.setRumble(wpilib.Joystick.RumbleType.kLeftRumble_val, 0.8)
-        self.auto_mode = 0
-        self.auto_defense = 0
-        self.auto_position = 0
+        self.auto_mode = 3
+        self.auto_defense = 4
+        self.auto_position = 3
         #self.dc = DashComm()
         wpilib.DriverStation.reportError("\nWaiting for auton selection...", False)
-        self.waitForAuton()
+        #self.waitForAuton()
+        
+        
         #wpilib.Timer.delay(1000)
         
     def waitForAuton(self):
@@ -129,7 +131,12 @@ class MyRobot(wpilib.SampleRobot):
         wpilib.DriverStation.reportError("\nPress select twice to use default code", False)
         
         locked = False
-        while(not locked and not wpilib.DriverStation.getInstance().isEnabled() and not self.isSimulation() and not self.isOperatorControl() and not self.isAutonomous()): #todo- some FMS check
+        print(not locked)
+        print(not wpilib.DriverStation.getInstance().isEnabled())
+        print(not self.isSimulation())
+        print(not self.isOperatorControl())
+        print(not self.isAutonomous())
+        while(not locked and not wpilib.DriverStation.getInstance().isEnabled() and not self.isSimulation()): #todo- some FMS check
             self.camera.processImage()
             oi.OI.refresh()
             wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
@@ -324,7 +331,7 @@ class MyRobot(wpilib.SampleRobot):
                         position = position + 1
                         if position > max_position:
                             position = 1
-                elif j.getRawButton(b.start):
+                elif j.getRawButton(b.start) or False:
                     if not buttonPressed:
                         buttonPressed = True
                         if startClickedOnce:
@@ -373,6 +380,9 @@ class MyRobot(wpilib.SampleRobot):
                     update = False
                     startClickedOnce = False
                     selectClickedOnce = False
+                    self.auto_mode = mode
+                    self.auto_defense = defense
+                    self.auto_position = position
                     wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[mode-1], False)
                     wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[defense-1], False)
                     wpilib.DriverStation.reportError("\nSelected Position: " + positions[position-1], False)
@@ -416,7 +426,7 @@ class MyRobot(wpilib.SampleRobot):
         wpilib.DriverStation.reportError("\n\n\n\n\nSelected Auton: " + modes[self.auto_mode-1], False)
         wpilib.DriverStation.reportError("\nSelected Defense: " + defenses[self.auto_defense-1], False)
         wpilib.DriverStation.reportError("\nSelected Position: " + positions[self.auto_position-1], False)
-        self.auto_manager.autonomousInit(3, 4, 3)
+        self.auto_manager.autonomousInit(self.auto_mode, self.auto_defense, self.auto_position)
         print("Auto selections {} {} {}".format(self.auto_defense, self.auto_mode, self.auto_position))
         #else:
         #    print("DashComm Valid")
@@ -512,7 +522,7 @@ class MyRobot(wpilib.SampleRobot):
                 self.driveTrain.pid_periodic(-OI.driver_move.toDouble())
             else:
                 self.wasRotatePID = False
-                self.driveTrain.arcadeDrive(-OI.driver_move.toDouble() * driveFactor, -OI.driver_rotate.toDouble() * driveFactor, squaredInputs = False)
+                self.driveTrain.arcadeDrive(self.deadband(-OI.driver_move.toDouble()) * driveFactor, self.deadband(-OI.driver_rotate.toDouble()) * driveFactor, squaredInputs = False)
             
             
             

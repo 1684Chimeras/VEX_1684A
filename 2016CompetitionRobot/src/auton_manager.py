@@ -24,7 +24,7 @@ class AutonManager(object):
             print("init")
             time.auton_start = time.time()
             self.loadAutons()
-            print("Mode: {}".format(mode-1))
+            print("Mode: {}".format(defense))
             self.selectedAuton = self.autons[mode-1]
             if hasattr(self.selectedAuton, "setOuterWorksType"):
                 self.selectedAuton.setOuterWorksType(defense)

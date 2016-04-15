@@ -52,7 +52,7 @@ class DriveTrain(object):
     
     def ready_to_shoot(self):
         return abs(self.pid_calc_error()) < self.max_error
-    def pid_periodic(self,move):
+    def pid_periodic(self,move, powerMultiplier=1):
         #prev 0.023 0.4 0.13
         const_kP = 0.033
         const_kI = 0.5
@@ -74,10 +74,12 @@ class DriveTrain(object):
         SmartDashboard.putNumber("Drive Pid Error", error)
         SmartDashboard.putNumber("Drive Pid Setpoint", self.setpoint)
         SmartDashboard.putNumber("Total", -(kP + kI + kFF))
-        self.arcadeDrive(move, -(kP + kI + kFF), False, 8)
+        self.arcadeDrive(move, (-(kP + kI)) * powerMultiplier - kFF, False, 12)
         
         
     def arcadeDrive(self, move, rotate, squaredInputs=True, voltage=12):
+        if move < 0.1 and move > -0.1: move = 0;
+        if rotate < 0.1 and rotate > -0.1: rotate = 0;
         if abs(move) > 0.98:
             if move > 0:
                 move = 1

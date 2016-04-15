@@ -23,6 +23,6 @@ class Climber(object):
         
     def setTape(self, value):
         if(value < 0):
-            self.tape.set(value * 0.8)
+            self.tape.set(value )
         else:
-            self.tape.set(value * 0.3)
+            self.tape.set(value * 0.5)

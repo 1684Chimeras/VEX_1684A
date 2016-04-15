@@ -34,8 +34,8 @@ class DriveRoutine(BaseAutonRoutine):
     def periodic(self):
         #print("Periodic")
         if self.keepTrue:
-            #print("Periodic kt")
-            self.drive_train.pid_periodic(self.move)
+            print("Periodic kt")
+            self.drive_train.pid_periodic(self.move, powerMultiplier=1.3)
         else:
             #print("Periodic b")
             self.drive_train.arcadeDrive(self.move, self.rotate)

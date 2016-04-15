@@ -38,10 +38,10 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
                 self.queue.set(1)
                 self.intake.set(-1)
             
-            if time.auton_start + 9 < time.time():
+            if time.auton_start + 13 < time.time():
                 self.queue.set(1)
                 self.intake.set(-1)
-                self.flipper.pid_goto(180)
+                #self.flipper.pid_goto(180)
                 
-                if time.auton_start + 9.5 < time.time():
-                    self.flipper.pid_goto(185)
+                #if time.auton_start + 13.5 < time.time():
+                #    self.flipper.pid_goto(185)

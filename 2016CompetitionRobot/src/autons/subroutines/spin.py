@@ -12,16 +12,20 @@ class SpinRoutine(BaseAutonRoutine):
     '''
 
 
-    def __init__(self, deg, timeout = -1):
+    def __init__(self, deg, timeout = -1, resetGyro=True):
         self.deg = deg
+        self.resetGyro = resetGyro
         if timeout != -1:
             self.setTimeout(timeout)
     
     def initialize(self):
-        self.drive.pid_rotate(self.deg)
+        if self.resetGyro:
+            self.drive_train.pid_rotate(self.deg)
+        else:
+            self.drive_train.pid_rotate(self.deg + self.drive_train.gyro.getAngle())
         
     def periodic(self):
-        self.drive.pid_periodic()
+        self.drive_train.pid_periodic()
         
     def onFinished(self):
-        self.drive.stop()
+        self.drive_train.stop()

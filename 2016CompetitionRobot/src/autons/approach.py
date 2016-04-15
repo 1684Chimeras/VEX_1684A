@@ -8,7 +8,7 @@ class Approach(autons._base_auton.BaseAutonRoutine):
         autons._base_auton.BaseAutonRoutine.__init__(self)
         self.timeStarted = time.time()
         
-        self.driveStage1= drive.DriveRoutine(0.7, 0, timeout=444)
+        self.driveStage1= drive.DriveRoutine(0.5, 0, timeout=444)
         self.driveStage2= drive.DriveRoutine(0, 0, timeout=444)
     def getPriority(self):
         return
