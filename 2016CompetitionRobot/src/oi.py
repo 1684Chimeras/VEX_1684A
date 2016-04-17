@@ -46,11 +46,11 @@ class OI(object):
         #OI.intake = InputOption.buttons(driver, OI.b, OI.x)
         OI.queue = InputOption.buttons(driver, OI.lb, OI.a)
         OI.shooter = InputOption.button(driver, OI.rb)
-        OI.shooter_max_speed = InputOption.button(driver, OI.y)
-        OI.rotate_pid = InputOption.button(driver, OI.b)
+        OI.shooter_max_speed = InputOption.button(driver, OI.start)
+        OI.rotate_pid = InputOption.button(driver, OI.y)
         OI.outer_arm_only = InputOption.button(driver, OI.x)
         
-        OI.drive_low = InputOption.button(driver, OI.b)
+        OI.drive_low = InputOption.button(driver, OI.select)
         OI.driver_move = InputOption.axis(driver, OI.ly)
         OI.driver_rotate = InputOption.axis(driver, OI.rx)
         

@@ -139,7 +139,13 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                     self.periodic()
                     
             elif self.type == self.OuterWorksType.ramparts:
-                pass
+                if self.getTimeElapsed() - 1.4 < 1:
+                    self.driveStageZero.run()
+                elif self.getTimeElapsed() - 1.4 < 4:
+                    self.driveStageZero.terminate()
+                    self.driveStage.run()
+                else:
+                    self.driveStage.terminate()
             else:
                 return
         elif self.getTimeElapsed() > 0.9:
@@ -182,11 +188,11 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             self.useGenericRun = False
         elif self.type == self.OuterWorksType.ramparts:
             self.driveStage = drive.DriveRoutine(0.9, 0,  timeout=4.8 , keepTrue=True)
-            self.useGenericRun = True
+            self.driveStageZero= drive.DriveRoutine(0.6, 0,  timeout=4.8 , keepTrue=True)
         elif self.type == self.OuterWorksType.rough_terrain:
             self.useGenericRun = True
             rammingSpeed = 0.9
-            rammingSpeedTimeout = 4
+            rammingSpeedTimeout = 1.8
         elif self.type == self.OuterWorksType.sally_port: #sally port is actually just a testing ground for low bar
             rammingSpeedTimeout = 0.83 #actual value 1.4
             self.useGenericRun = True

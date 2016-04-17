@@ -276,11 +276,25 @@ class MyRobot(wpilib.SampleRobot):
         defaultDefense = 4
         defaultPosition = 3
         locked = False
+        self.wasRotatePID = False
+        OI = oi.OI
         
         while self.isDisabled():
             
-            self.camera.processImage()
             oi.OI.refresh()
+            self.camera.processImage()
+        
+           # if OI.rotate_pid.toBoolean() or OI.joy0.getRawButton(OI.y):
+            #    wpilib.DriverStation.reportError("\nReset gyro offset {}".format(self.driveTrain.gyro.getAngle()), False)          
+            #    if not self.wasRotatePID:
+            #        self.wasRotatePID = True
+            #        if OI.joy0.getRawButton(OI.y):
+            #            self.driveTrain.pid_rotate(0)
+            #        else:
+            #            wpilib.DriverStation.reportError("\nRESET rotation offset {}".format(self.camera.getRotationOffset()), False)
+            #            self.driveTrain.pid_rotate(self.camera.getRotationOffset())
+             #   wpilib.DriverStation.reportError("\nReset rotation offset {}".format(self.camera.getRotationOffset()), False)    
+                
             wpilib.SmartDashboard.putNumber("Potentiometer", self.flipper.getArmPosition())
             wpilib.SmartDashboard.putNumber("Potentiometer Raw", self.flipper.getPotValue())
             wpilib.SmartDashboard.putNumber("Gyro Reading", self.robotGyro.getAngle())
@@ -513,12 +527,15 @@ class MyRobot(wpilib.SampleRobot):
                 driveFactor = 0.7
                 
             if OI.rotate_pid.toBoolean() or OI.joy0.getRawButton(OI.y):
+                wpilib.DriverStation.reportError("\nReset gyro offset {}".format(self.driveTrain.gyro.getAngle()), False)          
                 if not self.wasRotatePID:
                     self.wasRotatePID = True
                     if OI.joy0.getRawButton(OI.y):
                         self.driveTrain.pid_rotate(0)
                     else:
+                        wpilib.DriverStation.reportError("\nRESET rotation offset {}".format(self.camera.getRotationOffset()), False)
                         self.driveTrain.pid_rotate(self.camera.getRotationOffset())
+                wpilib.DriverStation.reportError("\nReset rotation offset {}".format(self.camera.getRotationOffset()), False)   
                 self.driveTrain.pid_periodic(-OI.driver_move.toDouble())
             else:
                 self.wasRotatePID = False
