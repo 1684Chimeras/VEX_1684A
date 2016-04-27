@@ -138,6 +138,7 @@ class Camera(object):
                         DashComm.print("Frame Created")
                         if i < 99990: 
                             DashComm.print("Good Frame")
+                            cv2.imwrite("/home/camera/test.jpg")
                             #process ret
                             hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
                             lower_bound = np.array([70,115,226])
@@ -199,7 +200,7 @@ class Camera(object):
         Constructor
         '''
         #start GRIP
-       # _thread.start_new_thread( self.startProcess, ("Grip-Thread", "literally nothing",))
+        _thread.start_new_thread( self.startProcess, ("Grip-Thread", "literally nothing",))
         self.cvWorking = False
         self.rotateError = 0
         self.largestArea = 0
