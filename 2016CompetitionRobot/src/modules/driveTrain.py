@@ -58,6 +58,9 @@ class DriveTrain(object):
         const_kI = 0.5
         const_kFF = 0.17
         error = self.pid_calc_error()
+        if abs(error) > 720:
+            self.arcadeDrive(0, 0, False, 12)
+            return
         ##if error < 5:
         #    const_kI = 1.66 - (error / 6)
         self.integral_accum = self.integral_accum + (min(1, max(-1, error)) * 0.005)

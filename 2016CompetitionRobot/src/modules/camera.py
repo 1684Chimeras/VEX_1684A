@@ -48,7 +48,9 @@ class Camera(object):
     def processImage(self):
         #print("PROCESS IMAGE")
         #print("What idiot just called the camera.processImage function?")
-        self.rotateError = -500
+        if True:
+            return
+        self.rotateError = -5000
         try:
             beta = self._getArray("area")
             x = self._getArray("centerX")
@@ -105,7 +107,8 @@ class Camera(object):
         while 1:
             try:
                 DashComm.print("Starting Process")
-                stream = urllib.request.urlopen('http://10.16.84.130/mjpg/video.mjpg')
+                self.rotateError = -5000
+                stream = urllib.request.urlopen('http://10.16.84.11/mjpg/video.mjpg')
                 #
                 #self.dataValid = False
                 #video_capture = cv2.VideoCapture(0)
@@ -128,7 +131,7 @@ class Camera(object):
                             b = feedBytes.find(b'\xff\xd9')
                             if a != -1 and b != -1:
                                 DashComm.print("GOOD : Icount {} {} {}".format(i,a,b))
-                                DashComm.print(feedBytes)
+                                #DashComm.print(feedBytes)
                                 jpg = feedBytes[a:b+2]
                                 feedBytes = feedBytes[b+2:]
                                 frame = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
@@ -138,11 +141,14 @@ class Camera(object):
                         DashComm.print("Frame Created")
                         if i < 99990: 
                             DashComm.print("Good Frame")
-                            cv2.imwrite("/home/camera/test.jpg")
+                            cv2.imwrite("/home/lvuser/test.png", frame);
+                            DashComm.print("Write Scucess")
                             #process ret
                             hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
-                            lower_bound = np.array([70,115,226])
-                            upper_bound = np.array([112,225,255])
+                            #lower_bound = np.array([70,115,226])
+                            #upper_bound = np.array([112,225,255])
+                            lower_bound = np.array([50,50,50])
+                            upper_bound = np.array([200,200,200])
                         
                             # Threshold the HSV image to get only green colors
                             mask = cv2.inRange(hsv, lower_bound, upper_bound)
@@ -192,7 +198,8 @@ class Camera(object):
                     
                 import time
                 time.sleep(2)
-            except:
+            except IOError as e:
+                print(e.strerr)
                 import time
                 time.sleep(2)
     def __init__(self):

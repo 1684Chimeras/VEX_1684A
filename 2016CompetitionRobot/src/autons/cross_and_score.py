@@ -109,10 +109,12 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                             print("put arm down")
                             self.flipper.set_override(0.6)
                             self.drive_train.arcadeDrive(0,0)
-                        else:
+                        elif not self.driveStage.isFinished():
                             self.flipper.set_override(0.6)
                             self.driveStage.run()
-                            print("approach")
+                        else:
+                            self.targetingEnable = True
+                            self.periodic()
                     else:
                         print("not cheval")
                         if self.getTimeElapsed() > 7.5:
@@ -121,8 +123,11 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                         if self.getTimeElapsed() > 6:
                             self.flipper.set_override(0.3)
                             self.drive_train.arcadeDrive(0.8,0)
-                        else:
+                        elif not self.driveStage.isFinished():
                             self.driveStage.run()
+                        else:
+                            self.targetingEnable = True
+                            self.periodic()
                     #self.driveStage.run()
                     self.intakeInitialStage.run()
                     
@@ -141,11 +146,14 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             elif self.type == self.OuterWorksType.ramparts:
                 if self.getTimeElapsed() - 1.4 < 1:
                     self.driveStageZero.run()
-                elif self.getTimeElapsed() - 1.4 < 4:
+                elif self.getTimeElapsed() - 1.4 < 3.5:
                     self.driveStageZero.terminate()
                     self.driveStage.run()
-                else:
+                elif self.getTimeElapsed() - 1.4 < 5:
                     self.driveStage.terminate()
+                else:
+                    self.targetingEnable = True
+                    self.periodic()
             else:
                 return
         elif self.getTimeElapsed() > 0.9:
