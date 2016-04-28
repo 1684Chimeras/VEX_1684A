@@ -45,7 +45,7 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             return 160
         
         elif self.type == self.OuterWorksType.guillotine:
-            return 170
+            return 205
         
         elif self.type == self.OuterWorksType.ramparts:
             if self.getTimeElapsed() > 3:
@@ -59,19 +59,18 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
     
     def periodic(self):
         #targeting
-        if self.targetingEnable:
-            if self.score:
-                self.flipper.pid_goto(120)
-                if hasattr(self, "spinStage"):
-                    if self.spinStage.isFinished():
-                        self.spinStage.terminate()
-                        self.targeting.run()
-                        self.autoshoot.run()
-                    else:
-                        self.spinStage.run()
-                else:
+        if self.targetingEnable and self.score:
+            self.flipper.pid_goto(120)
+            if hasattr(self, "spinStage"):
+                if self.spinStage.isFinished():
+                    self.spinStage.terminate()
                     self.targeting.run()
                     self.autoshoot.run()
+                else:
+                    self.spinStage.run()
+            else:
+                self.targeting.run()
+                self.autoshoot.run()
                     
                     
         elif self.getTimeElapsed() > 1.4:
@@ -117,14 +116,14 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                             self.periodic()
                     else:
                         print("not cheval")
-                        if self.getTimeElapsed() > 7.5:
-                            self.drive_train.arcadeDrive(0,0)
-                            self.flipper.set_override(0)
-                        if self.getTimeElapsed() > 6:
+                        if self.getTimeElapsed() - 1.4 < 3.5:
+                            self.driveStage.run()
+                        elif self.getTimeElapsed() - 1.4 < 4.2:
                             self.flipper.set_override(0.3)
                             self.drive_train.arcadeDrive(0.8,0)
-                        elif not self.driveStage.isFinished():
-                            self.driveStage.run()
+                        elif self.getTimeElapsed() - 1.4 < 5.5:
+                            self.drive_train.arcadeDrive(0,0)
+                            self.flipper.set_override(0)
                         else:
                             self.targetingEnable = True
                             self.periodic()
@@ -178,8 +177,8 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             self.intakeInitialStage = run_intake.IntakeRoutine(0,-1)
             self.timeoutMark = -1
         elif self.type == self.OuterWorksType.guillotine:
-            self.driveStage = drive.DriveRoutine(0.5, 0.1,  timeout=13)
-            self.intakeInitialStage = run_intake.IntakeRoutine(0,1)
+            self.driveStage = drive.DriveRoutine(0.55, 0.1,  timeout=13)
+            self.intakeInitialStage = run_intake.IntakeRoutine(0,1, timeout=8)
             self.timeoutMark = -1
             return
         elif self.type == self.OuterWorksType.moat:

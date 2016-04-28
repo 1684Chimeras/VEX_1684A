@@ -141,19 +141,20 @@ class Camera(object):
                         DashComm.print("Frame Created")
                         if i < 99990: 
                             DashComm.print("Good Frame")
-                            cv2.imwrite("/home/lvuser/test.png", frame);
+                            #cv2.imwrite("/home/lvuser/test.png", frame);
                             DashComm.print("Write Scucess")
                             #process ret
                             hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
+                            cv2.imwrite("/home/lvuser/test.png", hsv);
                             #lower_bound = np.array([70,115,226])
                             #upper_bound = np.array([112,225,255])
-                            lower_bound = np.array([50,50,50])
-                            upper_bound = np.array([200,200,200])
+                            lower_bound = np.array([70,115,226])
+                            upper_bound = np.array([112,225,255])
                         
                             # Threshold the HSV image to get only green colors
                             mask = cv2.inRange(hsv, lower_bound, upper_bound)
                             #erode
-                            kernel = np.ones((3,3),np.uint8)
+                            kernel = np.ones((2,2),np.uint8)
                             erosion = cv2.erode(mask,kernel,iterations = 1)
                             #dilate
                             dilate = cv2.dilate(erosion,kernel,iterations = 3)
@@ -198,8 +199,7 @@ class Camera(object):
                     
                 import time
                 time.sleep(2)
-            except IOError as e:
-                print(e.strerr)
+            except :
                 import time
                 time.sleep(2)
     def __init__(self):
