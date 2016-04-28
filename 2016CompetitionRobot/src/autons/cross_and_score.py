@@ -59,6 +59,8 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             else:
                 print("Arm Up")
                 return 173
+        elif self.type == self.OuterWorksType.bump:
+            return 178
         else:
             return 205
     
@@ -194,8 +196,8 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
         elif self.type == self.OuterWorksType.bump:
             #rammingSpeed = -0.9
-            rammingSpeed = 0.7
-            rammingSpeedTimeout = 4
+            rammingSpeed = 0.87
+            rammingSpeedTimeout = 3.9
             #self.driveStageZero = drive.DriveRoutine(0.8, 0.1, timeout=4)
             #self.driveStageOne = drive.DriveRoutine(0.8, 0.1, timeout=4)
             self.useGenericRun = True

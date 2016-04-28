@@ -25,7 +25,7 @@ class SpinRoutine(BaseAutonRoutine):
             self.drive_train.pid_rotate(self.deg + self.drive_train.gyro.getAngle())
         
     def periodic(self):
-        self.drive_train.pid_periodic()
+        self.drive_train.pid_periodic(0)
         
     def onFinished(self):
         self.drive_train.stop()

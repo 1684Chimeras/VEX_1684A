@@ -51,6 +51,7 @@ class Camera(object):
         #if True:
          #   return
         self.rotateError = -5000
+        self.gripWorking = False
         try:
             beta = self._getArray("area")
             x = self._getArray("centerX")
@@ -62,6 +63,7 @@ class Camera(object):
                     self.largestIndex = index
                     self.largestArea = beta[index]
             if self.largestIndex != -1:
+                self.gripWorking = True
                 wpilib.SmartDashboard.putNumber("Largest Area", beta[self.largestIndex])
                 wpilib.SmartDashboard.putNumber("Largest x", x[self.largestIndex])
                 wpilib.SmartDashboard.putNumber("Largest y", y[self.largestIndex])
@@ -75,12 +77,13 @@ class Camera(object):
             pass
         except IndexError:
             pass
+        
         if self.rotateError == -500:
             self.gripWorking = False
         else:
             self.gripWorking = True 
     
-    def gripWorking(self):
+    def isGripWorking(self):
         return self.gripWorking
     
     def getPixelXOffset(self):

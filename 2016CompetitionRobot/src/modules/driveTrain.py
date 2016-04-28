@@ -54,9 +54,9 @@ class DriveTrain(object):
         return abs(self.pid_calc_error()) < self.max_error
     def pid_periodic(self,move, powerMultiplier=1):
         #prev 0.023 0.4 0.13
-        const_kP = 0.027
+        const_kP = 0.028
         const_kI = 0.5
-        const_kFF = 0.16
+        const_kFF = 0.17
         error = self.pid_calc_error()
         if abs(error) > 720:
             self.arcadeDrive(0, 0, False, 12)

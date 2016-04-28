@@ -31,14 +31,15 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
         return
 
     def periodic(self):
-        if self.camera.gripWorking():
+        if self.camera.isGripWorking():
             self.gripWorking = True
+            
         if self.gripWorking:
             if self.shooter.wheelGood() and (self.targetingRoutine == 0 or self.targetingRoutine.ready()):
                 self.queue.set(1)
                 self.intake.set(-1)
             
-            if time.auton_start + 13 < time.time():
+            if time.auton_start + 13 < time.time() and (self.targetingRoutine == 0 or self.targetingRoutine.ready()):
                 self.queue.set(1)
                 self.intake.set(-1)
                 #self.flipper.pid_goto(180)

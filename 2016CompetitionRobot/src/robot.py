@@ -569,7 +569,7 @@ class MyRobot(wpilib.SampleRobot):
                     self.flipper.pid_goto(173)
                     
                 if OI.arm_pid_diag.toBoolean():
-                    self.flipper.pid_goto(121)
+                    self.flipper.pid_goto(118)
                     
                 if OI.arm_pid_backward.toBoolean():
                     self.flipper.pid_goto(165)
