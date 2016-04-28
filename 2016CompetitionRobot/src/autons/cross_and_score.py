@@ -42,7 +42,12 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
     def getPIDSetpoint(self):
         print("type {}".format(self.type))
         if self.type == self.OuterWorksType.cheval_de_frise:
-            return 160
+            if self.getTimeElapsed() > 7:
+                print("Arm DOwn")
+                return 205
+            else:
+                print("Arm Up")
+                return 160
         
         elif self.type == self.OuterWorksType.guillotine:
             return 170
@@ -59,19 +64,20 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
     
     def periodic(self):
         #targeting
-        if self.targetingEnable and self.score:
-            self.flipper.pid_goto(120)
-            if hasattr(self, "spinStage"):
-                if self.spinStage.isFinished():
-                    self.spinStage.terminate()
+        if self.targetingEnable:
+            if self.score:
+                self.flipper.pid_goto(120)
+                if hasattr(self, "spinStage"):
+                    if self.spinStage.isFinished():
+                        self.spinStage.terminate()
+                        self.targeting.run()
+                        self.autoshoot.run()
+                    else:
+                        self.spinStage.run()
+                else:
                     self.targeting.run()
                     self.autoshoot.run()
-                else:
-                    self.spinStage.run()
-            else:
-                self.targeting.run()
-                self.autoshoot.run()
-                    
+                        
                     
         elif self.getTimeElapsed() > 1.4:
             self.flipper.pid_goto(self.getPIDSetpoint())
@@ -188,11 +194,11 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             #self.driveStage = drive.DriveRoutine(self.rammingSpeed, self.bindRight, timeout=self.rammingSpeedTimeout)
         elif self.type == self.OuterWorksType.bump:
             #rammingSpeed = -0.9
-            rammingSpeed = 0.8
+            rammingSpeed = 0.7
             rammingSpeedTimeout = 4
-            self.driveStageZero = drive.DriveRoutine(0.8, 0.1, timeout=4)
-            self.driveStageOne = drive.DriveRoutine(0.8, 0.1, timeout=4)
-            self.useGenericRun = False
+            #self.driveStageZero = drive.DriveRoutine(0.8, 0.1, timeout=4)
+            #self.driveStageOne = drive.DriveRoutine(0.8, 0.1, timeout=4)
+            self.useGenericRun = True
         elif self.type == self.OuterWorksType.ramparts:
             self.driveStage = drive.DriveRoutine(0.9, 0,  timeout=4.8 , keepTrue=True)
             self.driveStageZero= drive.DriveRoutine(0.6, 0,  timeout=4.8 , keepTrue=True)
