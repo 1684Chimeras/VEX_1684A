@@ -196,7 +196,7 @@ class MyRobot(wpilib.SampleRobot):
                         position = position + 1
                         if position > max_position:
                             position = 1
-                elif j.getRawButton(b.start):
+                elif j.getRawButton(b.start) and False:
                     if not buttonPressed:
                         buttonPressed = True
                         if startClickedOnce:
@@ -345,7 +345,7 @@ class MyRobot(wpilib.SampleRobot):
                         position = position + 1
                         if position > max_position:
                             position = 1
-                elif j.getRawButton(b.start) or False:
+                elif j.getRawButton(b.start) and False:
                     if not buttonPressed:
                         buttonPressed = True
                         if startClickedOnce:
