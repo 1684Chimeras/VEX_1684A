@@ -48,8 +48,8 @@ class Camera(object):
     def processImage(self):
         #print("PROCESS IMAGE")
         #print("What idiot just called the camera.processImage function?")
-        if True:
-            return
+        #if True:
+         #   return
         self.rotateError = -5000
         try:
             beta = self._getArray("area")
@@ -148,8 +148,8 @@ class Camera(object):
                             cv2.imwrite("/home/lvuser/test.png", hsv);
                             #lower_bound = np.array([70,115,226])
                             #upper_bound = np.array([112,225,255])
-                            lower_bound = np.array([70,115,226])
-                            upper_bound = np.array([112,225,255])
+                            lower_bound = np.array([73,115,226])
+                            upper_bound = np.array([225,225,255])
                         
                             # Threshold the HSV image to get only green colors
                             mask = cv2.inRange(hsv, lower_bound, upper_bound)
@@ -157,7 +157,7 @@ class Camera(object):
                             kernel = np.ones((2,2),np.uint8)
                             erosion = cv2.erode(mask,kernel,iterations = 1)
                             #dilate
-                            dilate = cv2.dilate(erosion,kernel,iterations = 3)
+                            dilate = cv2.dilate(erosion,kernel,iterations = 4)
                             #contour filtering
                             image, contours, hierarchy = cv2.findContours(dilate,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
                             
@@ -207,7 +207,7 @@ class Camera(object):
         Constructor
         '''
         #start GRIP
-        _thread.start_new_thread( self.startProcess, ("Grip-Thread", "literally nothing",))
+        #gb_thread.start_new_thread( self.startProcess, ("Grip-Thread", "literally nothing",))
         self.cvWorking = False
         self.rotateError = 0
         self.largestArea = 0

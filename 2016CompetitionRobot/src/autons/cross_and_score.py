@@ -45,7 +45,7 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             return 160
         
         elif self.type == self.OuterWorksType.guillotine:
-            return 205
+            return 170
         
         elif self.type == self.OuterWorksType.ramparts:
             if self.getTimeElapsed() > 3:
