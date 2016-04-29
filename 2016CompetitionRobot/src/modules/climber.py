@@ -10,8 +10,8 @@ class Climber(object):
     classdocs
     '''
 
-    min = 0.0
-    max = 4096.0
+    min = 2040
+    max = 75
     angle_min = 0
     throw = 180.0
 

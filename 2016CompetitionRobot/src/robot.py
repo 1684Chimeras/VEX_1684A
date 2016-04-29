@@ -281,6 +281,8 @@ class MyRobot(wpilib.SampleRobot):
         
         while self.isDisabled():
             
+            wpilib.SmartDashboard.putNumber("Climber Hook", self.climber.getHookPosition())
+            wpilib.SmartDashboard.putNumber("Climber Hook Raw", self.climber.getHookEncoder())
             oi.OI.refresh()
             self.camera.processImage()
         
@@ -464,8 +466,11 @@ class MyRobot(wpilib.SampleRobot):
         self.wasFlipperSet = True
         self.wasRotatePID = False
         self.hasSeizure = False
+        self.killHookPID = False
+        self.killHookTime = -1
+        self.killHookTimeout = 4
         
-        armGoOut = False
+        armGoOut = True
         armPidOn = False
         armTime = 0
         armTimeout = 2
@@ -546,8 +551,54 @@ class MyRobot(wpilib.SampleRobot):
             
             
             
+            #Tape
+            if OI.tape.toDouble() > 0.5:
+                if not armPidOn or (armPidOn and not armGoOut):
+                    armGoOut = True
+                    armPidOn = True
+                    armTime = time.time()
+            elif OI.tape.toDouble() < -0.5:
+                if not armPidOn or (armPidOn and armGoOut):
+                    armGoOut = False
+                    armPidOn = True
+                    armTime = time.time()
+                    
+            if armPidOn:
+                if time.time() - armTimeout > armTime:
+                    armPidOn = False
+                else:
+                    if armGoOut:
+                        self.climber.setTape(1)
+                    else:
+                        self.climber.setTape(-1)
+            else:
+                
+                if not self.killHookPID:
+                    if self.climber.getHookPosition() > 60 and self.flipper.setpoint > 169 and self.flipper.getArmPosition() > 170:
+                        self.climber.setTape(1.3)
+                        
+                        if self.killHookTime == -1:
+                            self.killHookTime = time.time()
+                            
+                        if self.killHookTime + self.killHookTimeout < time.time():
+                            self.killHookPID = True
+                            wpilib.DriverStation.reportError("\nHook Disabled", False)
+                    else:
+                        if not armGoOut and self.flipper.setpoint < 100:
+                            self.climber.setTape((180 - self.climber.getHookEncoder()) * 0.0034)
+                        else:
+                            self.climber.setTape(0)
+                        self.killHookTime = -1
+                else:
+                    print("Hook PID Kill Engaged")
+                    if not armGoOut and self.flipper.setpoint < 100:
+                        self.climber.setTape((180 - self.climber.getHookEncoder()) * 0.0034)
+                    else:
+                        self.climber.setTape(0)
+            #Pulley
+            self.climber.setPulley(self.deadband(OI.pulley.toDouble()))
+            
             #FLIPPER
-            #TODO - Re-insert PID to flipper
             if(abs(OI.flipper.toDouble()) > 0.25):
                 self.flipper.driver_control(OI.flipper.toDouble() * 0.8)
                 self.wasFlipperSet = True
@@ -573,6 +624,12 @@ class MyRobot(wpilib.SampleRobot):
                     
                 if OI.arm_pid_backward.toBoolean():
                     self.flipper.pid_goto(165)
+                    
+                if armPidOn and not armGoOut and self.climber.getHookPosition() > 120 and self.flipper.setpoint == 118:
+                    self.flipper.pid_goto(88)
+                    print("Good!")
+                else:
+                    print("{} {}".format(self.climber.getHookPosition(), self.flipper.setpoint))
                     
                 if abs(OI.pulley.toDouble()) > 0.4:
                     self.flipper.pid_goto(205)
@@ -606,28 +663,6 @@ class MyRobot(wpilib.SampleRobot):
             else: #time to shot- 4sec
                 self.queue.set(OI.queue.toDouble() * 0.4)  
             
-            if OI.tape.toDouble() > 0.5:
-                if not armPidOn or (armPidOn and not armGoOut):
-                    armGoOut = True
-                    armPidOn = True
-                    armTime = time.time()
-            elif OI.tape.toDouble() < -0.5:
-                if not armPidOn or (armPidOn and armGoOut):
-                    armGoOut = False
-                    armPidOn = True
-                    armTime = time.time()
-                    
-            if armPidOn:
-                if time.time() - armTimeout > armTime:
-                    armPidOn = False
-                else:
-                    if armGoOut:
-                        self.climber.setTape(1)
-                    else:
-                        self.climber.setTape(-1)
-            else:
-                self.climber.setTape(0)
-            self.climber.setPulley(self.deadband(OI.pulley.toDouble()))
             #self.climber.setTape(self.deadband(OI.tape.toDouble()))
             
             #SHOOTER
@@ -635,68 +670,7 @@ class MyRobot(wpilib.SampleRobot):
             self.shooter.changeOnToggle(OI.shooter.toDouble())
             #END SHOOTER
             
-            '''
-            shooterSet = OI.shooter.toDouble()
-            print(shooterSet)
-            if(shooterSet != 0.0 and not self.shooterWasSet):
-                if(self.shooterSet == 0.0):
-                    self.shooterSet = shooterSet
-                else:
-                    self.shooterSet = 0.0
-                     
-                self.shooterWasSet = True
-            elif(shooterSet == 0.0 and self.shooterWasSet):
-                self.shooterWasSet = False
-                
-            self.shooter.set(-self.shooterSet * 7.6)           
-            '''
-#old stuff
-#             wpilib.SmartDashboard.putNumber("z-accel", self.robotAccel.getZ())
-#             self.driveTrain.arcadeDrive(self.leftStick.getRawAxis(5), -self.leftStick.getRawAxis(0))
-#             
-#             flipperSet = (self.leftStick.getRawAxis(3)  -self.leftStick.getRawAxis(2)) / -1.2
-#             self.flipper.set(flipperSet)
-#             
-#             intakeSet = self.generate(self.leftStick, 2,3)
-#             self.intake.set(-intakeSet * 0.6)
-#         
-#             queueSet = self.generate(self.leftStick, 1,4)
-#             
-#             if(intakeSet > 0.1 and queueSet == 0.0):
-#                 queueSet = 0.25
-#                 
-#             self.queue.set(-queueSet)
-#             
-#             climberRulerSet = 1.0 if self.leftStick.getPOV() == 0 else (-0.6 if self.leftStick.getPOV() == 180 else 0.0)
-#             self.climberRuler.set(-climberRulerSet)
-#             print("Climber Ruer set ")
-#             
-#             climberWinchSet = 1.0 if self.leftStick.getPOV() == 90 else (-1.0 if self.leftStick.getPOV() == 270 else 0.0)
-#             self.climber.set(climberWinchSet)
-#             
-#             shooterSet = self.generate(self.rightStick, 6,5)
-#             
-#             if(shooterSet != 0.0 and not self.shooterWasSet):
-#                 if(self.shooterSet == 0.0):
-#                     self.shooterSet = shooterSet
-#                 else:
-#                     self.shooterSet = 0.0
-#                     
-#                 self.shooterWasSet = True
-#             elif(shooterSet == 0.0 and self.shooterWasSet):
-#                 self.shooterWasSet = False
-#                     
-#             self.shooter.set(-self.shooterSet * 7.6)
             
-#
-#             intakeSet = 1.0 if self.leftStick.getRawButton(2) else (-1.0 if self.leftStick.getRawButton(3) else 0.0)
-#             self.tower.set(-intakeSet)
-#             
-#             queue = 1.0 if self.leftStick.getRawButton(1) else (-1.0 if self.leftStick.getRawButton(4) else 0.0)
-#             self.queue.set(-queue)
-#             
-#             shooterSet = 1.0 if self.leftStick.getRawButton(6) else (-1.0 if self.leftStick.getRawButton(5) else  0.0)
-#             self.shooter.set(-shooterSet)
             
             if time.time() - start > 0.005:
                 wpilib.Timer.delay(0.001)

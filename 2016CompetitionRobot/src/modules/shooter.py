@@ -41,8 +41,8 @@ class Shooter(object):
         self.maxVoltageSetpoint = 13
         #self.voltageSetpoint = 9.63 * (self.testSetpoint/ 26300.0)
         #self.decVoltageSetpoint = 9.4 * (self.testSetpoint / 26300.0)
-        self.voltageSetpoint = 11.21 * (self.testSetpoint/ 26300.0)
-        self.decVoltageSetpoint = 10.71 * (self.testSetpoint / 26300.0)
+        self.voltageSetpoint = 11.31 * (self.testSetpoint/ 26300.0)
+        self.decVoltageSetpoint = 10.82 * (self.testSetpoint / 26300.0)
         self.motor = wpilib.CANTalon(params)
         self.motor.reverseOutput(False)
         
