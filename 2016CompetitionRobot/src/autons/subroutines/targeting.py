@@ -4,7 +4,7 @@ Created on Jan 19, 2016
 @author: Arhowk
 '''
 from autons._base_auton import BaseAutonRoutine
-
+import wpilib
 class TargetingRoutine(BaseAutonRoutine):
     '''
     classdocs
@@ -20,6 +20,7 @@ class TargetingRoutine(BaseAutonRoutine):
     
     def initialize(self):
         #TODO- Quadratic, PID Loop
+        wpilib.DriverStation.reportError("\nCamera Offset: {}".format(self.camera.getRotationOffset()))
         self.drive_train.pid_rotate(self.camera.getRotationOffset())
 
     def periodic(self):

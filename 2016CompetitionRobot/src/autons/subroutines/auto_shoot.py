@@ -23,11 +23,10 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
             self.setTimeout(timeout)
             
     def initialize(self):
-        #TODO- Quadratic, PID Loop
-        DashComm.print("Set PDI")
+        #TODO- Quadratic, PID LoopX
         self.shooter.enable()
-        self.gripWorking = False
-        DashComm.print("Set pid done")
+        self.printedShootMessage = False
+        self.gripWorking = FalseX
         return
 
     def periodic(self):
@@ -38,10 +37,16 @@ class AutomaticShootingRoutine(BaseAutonRoutine):
             if self.shooter.wheelGood() and (self.targetingRoutine == 0 or self.targetingRoutine.ready()):
                 self.queue.set(1)
                 self.intake.set(-1)
+                if not self.printedShootMessage:
+                    self.printedShootMessage = True
+                    wpilib.DriverStation.reportError("\nAuto- Good Shot")
             
             if time.auton_start + 13 < time.time() and (self.targetingRoutine == 0 or self.targetingRoutine.ready()):
                 self.queue.set(1)
                 self.intake.set(-1)
+                if not self.printedShootMessage:
+                    self.printedShootMessage = True
+                    wpilib.DriverStation.reportError("\nAuto- Forced Shot")
                 #self.flipper.pid_goto(180)
                 
                 #if time.auton_start + 13.5 < time.time():

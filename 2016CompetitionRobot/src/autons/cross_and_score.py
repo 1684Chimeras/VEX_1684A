@@ -40,13 +40,10 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         self.type = type
 
     def getPIDSetpoint(self):
-        print("type {}".format(self.type))
         if self.type == self.OuterWorksType.cheval_de_frise:
             if self.getTimeElapsed() > 7:
-                print("Arm DOwn")
                 return 205
             else:
-                print("Arm Up")
                 return 160
         
         elif self.type == self.OuterWorksType.guillotine:
@@ -54,10 +51,8 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         
         elif self.type == self.OuterWorksType.ramparts:
             if self.getTimeElapsed() > 3:
-                print("Arm DOwn")
                 return 205
             else:
-                print("Arm Up")
                 return 173
         elif self.type == self.OuterWorksType.bump:
             return 178
@@ -85,14 +80,11 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
             self.flipper.pid_goto(self.getPIDSetpoint())
             if self.useGenericRun:
                 if not self.driveStage.isFinished():
-                    #print("Runnig Drive Stage {}".format(self.getTimeElapsed()))
                     self.driveStage.run()
                 elif self.timeoutMark == -1:
-                    #print("end drive  Stage {}".format(self.getTimeElapsed()))
                     self.driveStage.terminate()
                     self.timeoutMark = time.time()
                 elif self.timeoutMark + 2 < time.time():
-                    #print("targeting Drive Stage {}".format(self.getTimeElapsed()))
                     self.targetingEnable = True
                     self.periodic()
                     
@@ -103,17 +95,12 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                     
                     #For the cheval auton, you'll want to put the arm down after 1.2 seconds to put the fries down
                     if self.type == self.OuterWorksType.cheval_de_frise:
-                        print("type=chvl")
                         if self.getTimeElapsed() < 1.4 + 1.5:
-                            print("approach {}".format(self.getTimeElapsed()))
                             self.driveStageZero.run()
                         elif self.getTimeElapsed() < 1.4 + 2.0:
-                            print("stop")
                             self.drive_train.arcadeDrive(-0.2,0)
                             self.driveStageZero.terminate()
                         elif self.getTimeElapsed() < 1.4 + 2.5:
-                            print("arm down go")
-                            print("put arm down")
                             self.flipper.set_override(0.6)
                             self.drive_train.arcadeDrive(0,0)
                         elif not self.driveStage.isFinished():
@@ -123,16 +110,16 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
                             self.targetingEnable = True
                             self.periodic()
                     else:
-                        print("not cheval")
                         if self.getTimeElapsed() - 1.4 < 3.5:
                             self.driveStage.run()
-                        elif self.getTimeElapsed() - 1.4 < 4.2:
+                        elif self.getTimeElapsed() - 1.4 < 4.4:
                             self.flipper.set_override(0.3)
                             self.drive_train.arcadeDrive(0.8,0)
                         elif self.getTimeElapsed() - 1.4 < 5.5:
                             self.drive_train.arcadeDrive(0,0)
                             self.flipper.set_override(0)
                         else:
+                            self.flipper.set_override(0)
                             self.targetingEnable = True
                             self.periodic()
                     #self.driveStage.run()

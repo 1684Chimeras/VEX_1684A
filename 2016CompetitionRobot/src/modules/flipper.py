@@ -83,9 +83,11 @@ class Flipper(object):
     #positive constant (negative value) - up
     #previous before drivers meeting - 0.26 ff, -0.017[
     const_ff = 0.34
-    const_p = -0.026
+    #const_p = -0.026
+    #const_d = 0.02
+    const_p = -0.033
+    const_d = 0.05
     const_i = 0.01
-    const_d = 0.02
     
     def pid_goto(self, setpoint=-1):
         if(setpoint != -1):
