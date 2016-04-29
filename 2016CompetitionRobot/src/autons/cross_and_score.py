@@ -212,7 +212,7 @@ class CrossAndScore(autons._base_auton.BaseAutonRoutine):
         elif self.position == self.OuterWorksPosition.rightmost:
             self.spinStage = spin.SpinRoutine(-40 + indent, timeout=1.5, resetGyro=False)
         else:
-            self.spinStage = spin.SpinRoutine(0, timeout=1.5, resetGyro=False)
+            self.spinStage = spin.SpinRoutine(0 + indent, timeout=1.5, resetGyro=False)
             
         self.targeting = targeting.TargetingRoutine()
         self.autoshoot = auto_shoot.AutomaticShootingRoutine(self.targeting)
