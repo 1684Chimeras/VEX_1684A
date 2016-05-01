@@ -481,6 +481,8 @@ class MyRobot(wpilib.SampleRobot):
         hadBall = False
         hadBallTime = 0
         while self.isOperatorControl() and self.isEnabled():
+            wpilib.SmartDashboard.putNumber("Climber Hook", self.climber.getHookPosition())
+            wpilib.SmartDashboard.putNumber("Climber Hook Raw", self.climber.getHookEncoder())
             start = time.time()
             if(self.hasBallSwitch.getVoltage() < 0.2 or not self.hasBallSwitch2.get()):
                 if not hadBall:
@@ -574,8 +576,9 @@ class MyRobot(wpilib.SampleRobot):
             else:
                 
                 if not self.killHookPID:
-                    if self.climber.getHookPosition() > 60 and self.flipper.setpoint > 169 and self.flipper.getArmPosition() > 170:
-                        self.climber.setTape(1.3)
+                    if self.climber.getHookPosition() > 40 and self.flipper.setpoint > 169 and self.flipper.getArmPosition() > 170:
+                        wpilib.DriverStation.reportError("Hook PID Engaged {}".format(self.climber.getHookPosition()))
+                        self.climber.setTape(1.5)
                         
                         if self.killHookTime == -1:
                             self.killHookTime = time.time()
@@ -584,13 +587,14 @@ class MyRobot(wpilib.SampleRobot):
                             self.killHookPID = True
                             wpilib.DriverStation.reportError("\nHook Disabled", False)
                     else:
+                        wpilib.DriverStation.reportError("Hook PID Not Detected {}".format(self.climber.getHookPosition()))
                         if not armGoOut and self.flipper.setpoint < 100:
                             self.climber.setTape((180 - self.climber.getHookEncoder()) * 0.0034)
                         else:
                             self.climber.setTape(0)
                         self.killHookTime = -1
                 else:
-                    print("Hook PID Kill Engaged")
+                    wpilib.DriverStation.reportError("Hook PID Kill Engaged {}".format(self.climber.getHookPosition()))
                     if not armGoOut and self.flipper.setpoint < 100:
                         self.climber.setTape((180 - self.climber.getHookEncoder()) * 0.0034)
                     else:
@@ -625,7 +629,7 @@ class MyRobot(wpilib.SampleRobot):
                 if OI.arm_pid_backward.toBoolean():
                     self.flipper.pid_goto(165)
                     
-                if armPidOn and not armGoOut and self.climber.getHookPosition() > 120 and self.flipper.setpoint == 118:
+                if armPidOn and not armGoOut and self.climber.getHookPosition() > 60 and self.flipper.setpoint == 118:
                     self.flipper.pid_goto(88)
                     print("Good!")
                 else:

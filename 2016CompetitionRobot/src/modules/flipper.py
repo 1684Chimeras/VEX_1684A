@@ -83,7 +83,7 @@ class Flipper(object):
     #positive constant (negative value) - up
     #previous before drivers meeting - 0.26 ff, -0.017[
     const_ff = 0.34
-    const_p = -0.026
+    const_p = -0.035
     const_d = 0.02
     #const_p = -0.033
     #const_d = 0.05
@@ -145,8 +145,8 @@ class Flipper(object):
             value = max(-0.7, min(0.4, value))
         if(value > 1 and self.getArmPosition() > 185):
             value = 0
-        self.left.set(value * 7)
-        self.right.set(-value * 7)
+        self.left.set(value * 8)
+        self.right.set(-value * 8)
         wpilib.SmartDashboard.putNumber("Setpoint", value)
         
     def getPotValue(self):
