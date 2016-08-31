@@ -574,7 +574,8 @@ class MyRobot(wpilib.SampleRobot):
                     else:
                         self.climber.setTape(-1)
             else:
-                
+                self.climber.setTape(0)
+                '''
                 if not self.killHookPID:
                     if self.climber.getHookPosition() > 40 and self.flipper.setpoint > 169 and self.flipper.getArmPosition() > 170:
                         wpilib.DriverStation.reportError("Hook PID Engaged {}".format(self.climber.getHookPosition()))
@@ -600,6 +601,7 @@ class MyRobot(wpilib.SampleRobot):
                     else:
                         self.climber.setTape(0)
             #Pulley
+            '''
             self.climber.setPulley(self.deadband(OI.pulley.toDouble()))
             
             #FLIPPER
@@ -632,8 +634,6 @@ class MyRobot(wpilib.SampleRobot):
                 if armPidOn and not armGoOut and self.climber.getHookPosition() > 60 and self.flipper.setpoint == 118:
                     self.flipper.pid_goto(88)
                     print("Good!")
-                else:
-                    print("{} {}".format(self.climber.getHookPosition(), self.flipper.setpoint))
                     
                 if abs(OI.pulley.toDouble()) > 0.4:
                     self.flipper.pid_goto(205)
@@ -645,12 +645,6 @@ class MyRobot(wpilib.SampleRobot):
             #INTAKE
             if OI.outer_arm_only.toBoolean():
                 self.intake.set(OI.intake.toDouble(), 1)
-            elif OI.joy0.getPOV() == OI.north:
-                self.intake.set(-0.75,0)
-            elif OI.joy0.getPOV() == OI.east:
-                self.intake.set(-1,0)
-            elif OI.joy0.getPOV() == OI.west:
-                self.intake.set(-0.25,0)
             elif OI.queue.toDouble() != 0:
                 self.intake.set(-1,0)
             else:
@@ -671,7 +665,13 @@ class MyRobot(wpilib.SampleRobot):
             
             #SHOOTER
             #self.shooter.fullPowerToggle(OI.shooter_max_speed.toBoolean())
-            self.shooter.changeOnToggle(OI.shooter.toDouble())
+            if OI.intake.toDouble() < -0.5:
+                print("Run backwards")
+                self.shooter.motor.set(-5);
+                self.shooter.bitflip = 10
+            else:
+                print("Run backwards no {}".format(OI.intake.toDouble()))
+                self.shooter.changeOnToggle(OI.shooter.toDouble())
             #END SHOOTER
             
             

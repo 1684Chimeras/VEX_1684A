@@ -8,6 +8,8 @@ class InputOption(object):
     '''
     classdocs
     '''
+    
+    
     @staticmethod
     def button(joystick, button1):
         ret = InputOption(joystick)
@@ -46,8 +48,16 @@ class InputOption(object):
         ret.deg2 = deg2
         return ret
 
+    @staticmethod
+    def nothing():
+        ret = InputOption(0)
+        ret.nothing = True
+        return ret
+
     def __value(self):
-        if self.usePov:
+        if self.nothing:
+            return 0.0
+        elif self.usePov:
             if self.joystick.getPOV() == self.deg1:
                 return 1.0
             elif self.joystick.getPOV() == self.deg2:
@@ -79,6 +89,7 @@ class InputOption(object):
         Constructor
         '''
         self.joystick = joystick
+        self.nothing = False
         self.usePov = False
         self.useTriggers = False
         self.useAxis = False 

@@ -66,28 +66,45 @@ class OI(object):
         OI.arm_pid_slam =InputOption.pov(operator, OI.east)
         OI.arm_pid_backward =InputOption.pov(operator, OI.west)
         
+        OI.arm_pid_down_toggle = InputOption.nothing()
+        OI.arm_pid_climb_toggle = InputOption.nothing()
+        
     
     @staticmethod
     def initializeXboxSingleController():
-        joystick = OI.joy0
+        driver = OI.joy0
         #tableEx = [["squaredInputs","1"], ["scalar","2"]]
         
-        OI.intake = InputOption.buttons(joystick, OI.b, OI.x)
-        OI.queue = InputOption.buttons(joystick, OI.y, OI.a)
-        OI.shooter = InputOption.button(joystick, OI.rb)
-        OI.pulley = InputOption.pov(joystick, OI.east, OI.west)
-        OI.tape = InputOption.pov(joystick, OI.north, OI.south)
-        OI.flipper = InputOption.triggers(joystick)
-        OI.drive_low = InputOption.button(joystick, OI.x)
-        OI.outer_arm_only = InputOption.button(joystick, OI.x)
+        OI.intake = InputOption.triggers(driver)
+        #OI.intake = InputOption.buttons(driver, OI.b, OI.x)
+        OI.queue = InputOption.buttons(driver, OI.lb, OI.a)
+        OI.shooter = InputOption.button(driver, OI.rb)
+        OI.shooter_max_speed = InputOption.button(driver, OI.start)
+        OI.rotate_pid = InputOption.button(driver, OI.b)
+        OI.outer_arm_only = InputOption.button(driver, OI.x)
         
-        OI.driver_move = InputOption.axis(joystick, OI.ry)
-        OI.driver_rotate = InputOption.axis(joystick, OI.lx)
+        OI.drive_low = InputOption.button(driver, OI.select)
+        OI.driver_move = InputOption.axis(driver, OI.ly)
+        OI.driver_rotate = InputOption.axis(driver, OI.rx)
         
-        OI.arm_pid_off = InputOption.pov(joystick, OI.south)
-        OI.arm_pid_up = InputOption.pov(joystick, OI.north)
-        OI.arm_pid_hover = InputOption.pov(joystick, OI.east)
-        OI.arm_pid_diag =InputOption.pov(joystick, OI.west)
+        
+        OI.pulley = InputOption.nothing()
+        OI.tape = InputOption.nothing()
+        OI.flipper = InputOption.nothing()
+        
+        OI.arm_pid_off = InputOption.pov(driver, OI.south)
+        OI.arm_pid_up = InputOption.pov(driver, OI.north)
+        OI.arm_pid_hover = InputOption.nothing()
+        OI.arm_pid_diag =InputOption.pov(driver, OI.east)
+        OI.arm_pid_slam =InputOption.nothing()
+        OI.arm_pid_backward =InputOption.nothing()
+        
+        OI.arm_pid_down_toggle = InputOption.nothing()
+        OI.arm_pid_climb_toggle = InputOption.nothing()
+    
+    @staticmethod
+    def isDemoMode():
+        return True
     
     @staticmethod
     def driverVibrate(left,right):

@@ -45,6 +45,7 @@ class Shooter(object):
         self.decVoltageSetpoint = 10.82 * (self.testSetpoint / 26300.0)
         self.motor = wpilib.CANTalon(params)
         self.motor.reverseOutput(False)
+        self.bitflip = 0
         
         self.motor.enableBrakeMode(True)
         self.motor.changeControlMode(wpilib.CANTalon.ControlMode.Voltage)
@@ -136,6 +137,12 @@ class Shooter(object):
     timeToSpin = 5.33
     timeWhenWheelStarted = 0
     def set(self, value):
+        if self.bitflip > 0:
+            print("Bitflip Fail")
+            self.bitflip = self.bitflip- 1
+            return
+        print("Bitflip Pass")
+        
         if(value > 0.1 or value < -0.1):
             if(self.wasBrake):
                 self.wasBrake = False
